@@ -51,6 +51,9 @@ python -m ecotally examples/observations.csv --format matrix \
 
 # 生成无额外绘图库依赖的矢量图
 python -m ecotally examples/observations.csv --format svg -o diversity.svg
+
+# 导出完整 JSON、清单和各报告分区 CSV
+python -m ecotally examples/observations.csv --format bundle -o analysis
 ```
 
 ## 结果解释

@@ -31,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-o", "--output", type=Path, help="output file (default: stdout)")
     parser.add_argument(
         "--format",
-        choices=("csv", "json", "markdown", "matrix", "svg"),
+        choices=("csv", "json", "markdown", "matrix", "svg", "bundle"),
         default="csv",
         help="output format",
     )
@@ -218,6 +218,10 @@ def render(
     if output_format == "svg":
         return render_diversity_svg(report)
     rows = report["sites"]
+    return _rows_to_csv(rows)
+
+
+def _rows_to_csv(rows: list[dict[str, object]]) -> str:
     if not rows:
         return ""
     from io import StringIO
@@ -228,6 +232,37 @@ def render(
     writer.writeheader()
     writer.writerows(rows)
     return buffer.getvalue()
+
+
+def write_bundle(
+    report: dict[str, list[dict[str, object]]], output_dir: Path
+) -> list[str]:
+    """Write a deterministic multi-file analysis bundle."""
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    written = ["report.json"]
+    (output_dir / "report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    for section, rows in report.items():
+        if rows:
+            filename = f"{section}.csv"
+            (output_dir / filename).write_text(
+                _rows_to_csv(rows), encoding="utf-8"
+            )
+            written.append(filename)
+    manifest = {
+        "format": "ecotally-analysis-bundle",
+        "version": 1,
+        "ecotally_version": __version__,
+        "files": written,
+    }
+    (output_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return ["manifest.json", *written]
 
 
 def render_matrix(
@@ -311,19 +346,21 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        content = render(
-            analyze(
-                args.input,
-                layout=args.layout,
-                bootstrap=args.bootstrap,
-                rarefaction=args.rarefaction,
-                traits_path=args.traits,
-                standardize_trait_values=args.standardize_traits,
-                hill_orders=args.hill_orders,
-            ),
-            args.format,
-            metric=args.metric,
+        report = analyze(
+            args.input,
+            layout=args.layout,
+            bootstrap=args.bootstrap,
+            rarefaction=args.rarefaction,
+            traits_path=args.traits,
+            standardize_trait_values=args.standardize_traits,
+            hill_orders=args.hill_orders,
         )
+        if args.format == "bundle":
+            if not args.output:
+                raise ValueError("bundle format requires --output DIRECTORY")
+            write_bundle(report, args.output)
+            return 0
+        content = render(report, args.format, metric=args.metric)
         if args.output:
             args.output.write_text(content, encoding="utf-8")
         else:

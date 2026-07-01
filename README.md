@@ -109,6 +109,13 @@ dependencies:
 python -m ecotally examples/observations.csv --format svg -o diversity.svg
 ```
 
+Export a self-describing analysis bundle with full JSON, a manifest, and one
+CSV per non-empty report section:
+
+```shell
+python -m ecotally examples/observations.csv --format bundle -o analysis
+```
+
 ## Development
 
 ```shell

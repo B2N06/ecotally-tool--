@@ -7,7 +7,7 @@ from io import StringIO
 from pathlib import Path
 
 from ecotally import __version__
-from ecotally.cli import main, render_markdown, render_matrix
+from ecotally.cli import main, render_markdown, render_matrix, write_bundle
 from ecotally.io import (
     read_communities_csv,
     read_long_csv,
@@ -152,6 +152,33 @@ class IoAndCliTests(unittest.TestCase):
             content.splitlines(),
             ["site,a,b", "a,0.0,0.25", "b,0.25,0.0"],
         )
+
+    def test_analysis_bundle_writes_manifest_json_and_csv_sections(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        output = Path(directory.name) / "bundle"
+        report = {
+            "metadata": [{"ecotally_version": __version__}],
+            "sites": [{"site": "forest", "richness": 2}],
+            "pairwise": [],
+        }
+        files = write_bundle(report, output)
+        self.assertIn("manifest.json", files)
+        self.assertIn("sites.csv", files)
+        self.assertTrue((output / "report.json").is_file())
+        manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["ecotally_version"], __version__)
+        self.assertNotIn("pairwise.csv", manifest["files"])
+
+    def test_bundle_cli_requires_output_directory(self):
+        path = self.write_csv(
+            [{"site": "forest", "species": "oak", "abundance": 2}]
+        )
+        errors = StringIO()
+        with redirect_stderr(errors):
+            code = main([str(path), "--format", "bundle"])
+        self.assertEqual(code, 2)
+        self.assertIn("requires --output", errors.getvalue())
 
     def test_empty_site_is_reported_instead_of_crashing(self):
         path = self.write_csv(

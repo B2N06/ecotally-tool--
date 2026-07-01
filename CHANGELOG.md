@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.0 - 2026-07-01
+
+- Add self-describing multi-file analysis bundles.
+- Export full JSON plus one CSV for every non-empty report section.
+- Add a deterministic manifest with format and EcoTally versions.
+
 ## 0.18.0 - 2026-07-01
 
 - Add Berger-Parker dominance to every non-empty site summary.
