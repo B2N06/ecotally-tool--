@@ -39,6 +39,11 @@ ecological or sampling uncertainty.
 Here `a` and `b` are site richnesses and `c` is shared richness. Gamma
 richness is the union of observed species across sites.
 
+LCBD and SCBD are calculated by Hellinger-transforming each non-empty site's
+relative abundances (`sqrt(pᵢ)`), centering every species column, and
+partitioning the total squared deviation among site rows (LCBD) and species
+columns (SCBD). Each set sums to one when there is compositional variation.
+
 ## Functional diversity
 
 Community-weighted means use abundance renormalized over species with trait

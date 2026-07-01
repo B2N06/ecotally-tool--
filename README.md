@@ -18,6 +18,8 @@ Built-in quality checks flag empty sites, all-zero species, single-site inputs,
 and severe sampling imbalance before results are interpreted.
 Reports also include Berger-Parker dominance and tidy rank-abundance data for
 inspecting dominant and rare species.
+Hellinger-based LCBD and SCBD partitions identify unusually composed sites and
+the species contributing most to overall beta diversity.
 
 ```python
 from ecotally import calculate_diversity

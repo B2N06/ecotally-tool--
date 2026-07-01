@@ -20,6 +20,7 @@ from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
 from .functional import calculate_functional_diversity, standardize_traits
 from .svg import render_diversity_svg
+from .contribution import beta_contributions
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -188,6 +189,7 @@ def analyze(
         metadata["traits_sha256"] = hashlib.sha256(
             traits_path.read_bytes()
         ).hexdigest()
+    contributions = beta_contributions(communities)
     return {
         "metadata": [metadata],
         "dataset": [dataset],
@@ -200,6 +202,8 @@ def analyze(
         "rarefaction": rarefaction_rows,
         "functional": functional,
         "hill_profile": hill_profile,
+        "lcbd": contributions["lcbd"],
+        "scbd": contributions["scbd"],
     }
 
 
@@ -338,6 +342,10 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("functional", []))
         + "\n## Hill diversity profile\n\n"
         + _markdown_table(report.get("hill_profile", []))
+        + "\n## Local contributions to beta diversity\n\n"
+        + _markdown_table(report.get("lcbd", []))
+        + "\n## Species contributions to beta diversity\n\n"
+        + _markdown_table(report.get("scbd", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )

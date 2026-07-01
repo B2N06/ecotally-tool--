@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.0 - 2026-07-01
+
+- Add Hellinger-based local contributions to beta diversity (LCBD).
+- Add species contributions to beta diversity (SCBD).
+- Expose which sites and taxa drive whole-dataset compositional variation.
+
 ## 0.19.0 - 2026-07-01
 
 - Add self-describing multi-file analysis bundles.
