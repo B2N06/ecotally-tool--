@@ -347,6 +347,54 @@ class IoAndCliTests(unittest.TestCase):
             len(payload["metadata"][0]["site_metadata_sha256"]), 64
         )
 
+    def test_cli_group_summary(self):
+        observations = self.write_csv(
+            [
+                {"site": "a1", "species": "oak", "abundance": 3},
+                {"site": "a2", "species": "fern", "abundance": 4},
+                {"site": "b1", "species": "reed", "abundance": 5},
+            ]
+        )
+        metadata = self.write_csv(
+            [
+                {"site": "a1", "treatment": "control"},
+                {"site": "a2", "treatment": "control"},
+                {"site": "b1", "treatment": "restored"},
+            ],
+            headers=("site", "treatment"),
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main(
+                [
+                    str(observations),
+                    "--format",
+                    "json",
+                    "--site-metadata",
+                    str(metadata),
+                    "--group-by",
+                    "treatment",
+                ]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        control = next(
+            row for row in payload["group_summary"] if row["group"] == "control"
+        )
+        self.assertEqual(control["site_count"], 2)
+        self.assertEqual(control["gamma_richness"], 2)
+        self.assertEqual(payload["metadata"][0]["group_by"], "treatment")
+
+    def test_group_by_requires_metadata(self):
+        path = self.write_csv(
+            [{"site": "forest", "species": "oak", "abundance": 2}]
+        )
+        errors = StringIO()
+        with redirect_stderr(errors):
+            code = main([str(path), "--group-by", "treatment"])
+        self.assertEqual(code, 2)
+        self.assertIn("requires --site-metadata", errors.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

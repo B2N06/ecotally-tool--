@@ -58,6 +58,11 @@ python -m ecotally examples/observations.csv --format bundle -o analysis
 # 联接处理组、年份、栖息地、坐标等样方元数据
 python -m ecotally examples/observations.csv \
   --site-metadata examples/site-metadata.csv --format json
+
+# 按栖息地汇总各组 α、β、γ 多样性
+python -m ecotally examples/observations.csv \
+  --site-metadata examples/site-metadata.csv --group-by habitat \
+  --format markdown
 ```
 
 ## 结果解释

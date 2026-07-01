@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.24.0 - 2026-07-01
+
+- Add metadata-driven group summaries with `--group-by`.
+- Report group site count, gamma richness, mean alpha, Whittaker beta, and abundance.
+- Validate missing metadata files, unknown fields, and empty group values.
+
 ## 0.23.0 - 2026-07-01
 
 - Add site-level metadata ingestion and safe `meta_` field joins.

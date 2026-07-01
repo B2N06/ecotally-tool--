@@ -141,6 +141,17 @@ python -m ecotally examples/observations.csv \
 Joined fields use a `meta_` prefix. Reports flag observation sites without
 metadata and metadata rows without observations.
 
+Summarize communities by a metadata field:
+
+```shell
+python -m ecotally examples/observations.csv \
+  --site-metadata examples/site-metadata.csv --group-by habitat \
+  --format markdown
+```
+
+Each group receives site count, gamma richness, mean alpha richness, Whittaker
+beta, and total abundance.
+
 ## Development
 
 ```shell

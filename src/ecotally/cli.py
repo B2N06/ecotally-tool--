@@ -91,6 +91,10 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="CSV with site-level grouping, location, or time fields",
     )
+    parser.add_argument(
+        "--group-by",
+        help="site metadata field used for group-level community summaries",
+    )
     return parser
 
 
@@ -115,6 +119,7 @@ def analyze(
     hill_orders: list[float] | None = None,
     lcbd_permutations: int = 0,
     site_metadata_path: Path | None = None,
+    group_by: str | None = None,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     site_metadata = (
@@ -123,6 +128,8 @@ def analyze(
     traits = read_traits_csv(traits_path) if traits_path else None
     if traits and standardize_trait_values:
         traits = standardize_traits(traits)
+    if group_by and not site_metadata_path:
+        raise ValueError("--group-by requires --site-metadata")
     sites: list[dict[str, object]] = []
     uncertainty: list[dict[str, object]] = []
     rarefaction_rows: list[dict[str, object]] = []
@@ -208,6 +215,7 @@ def analyze(
         "traits_standardized": standardize_trait_values,
         "hill_orders": ",".join(str(order) for order in (hill_orders or [])),
         "lcbd_permutations": lcbd_permutations,
+        "group_by": group_by or "",
     }
     if traits_path:
         metadata["traits_file"] = traits_path.name
@@ -239,6 +247,25 @@ def analyze(
                 "message": "Metadata site has no observations.",
             }
         )
+    group_summary: list[dict[str, object]] = []
+    if group_by:
+        known_fields = {
+            field for values in site_metadata.values() for field in values
+        }
+        if group_by not in known_fields:
+            raise ValueError(f"site metadata has no field '{group_by}'")
+        groups: dict[str, dict[str, dict[str, float]]] = {}
+        for site, community in communities.items():
+            group = site_metadata.get(site, {}).get(group_by, "")
+            if group:
+                groups.setdefault(group, {})[site] = community
+        if not groups:
+            raise ValueError(f"site metadata field '{group_by}' has no usable values")
+        for group, group_communities in sorted(groups.items()):
+            result = summarize_dataset(group_communities).to_dict()
+            group_summary.append(
+                {"group_by": group_by, "group": group, **result}
+            )
     contributions = beta_contributions(communities)
     return {
         "metadata": [metadata],
@@ -260,6 +287,7 @@ def analyze(
             else []
         ),
         "metadata_issues": metadata_issues,
+        "group_summary": group_summary,
     }
 
 
@@ -406,6 +434,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("lcbd_significance", []))
         + "\n## Site metadata issues\n\n"
         + _markdown_table(report.get("metadata_issues", []))
+        + "\n## Group summaries\n\n"
+        + _markdown_table(report.get("group_summary", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -424,6 +454,7 @@ def main(argv: list[str] | None = None) -> int:
                 hill_orders=args.hill_orders,
                 lcbd_permutations=args.lcbd_permutations,
                 site_metadata_path=args.site_metadata,
+                group_by=args.group_by,
         )
         if args.format == "bundle":
             if not args.output:
