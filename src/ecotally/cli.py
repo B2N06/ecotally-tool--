@@ -12,7 +12,7 @@ from pathlib import Path
 
 from . import __version__
 from .beta import compare_communities
-from .diversity import calculate_diversity
+from .diversity import calculate_diversity, hill_number
 from .io import read_communities_csv, read_traits_csv
 from .estimation import estimate_richness, expected_richness, rarefaction_curve
 from .summary import summarize_dataset, summarize_species
@@ -70,7 +70,24 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="z-score traits before calculating functional distances",
     )
+    parser.add_argument(
+        "--hill-orders",
+        type=_parse_hill_orders,
+        default=[],
+        metavar="Q,Q,...",
+        help="add a Hill diversity profile for comma-separated orders",
+    )
     return parser
+
+
+def _parse_hill_orders(value: str) -> list[float]:
+    try:
+        orders = [float(part.strip()) for part in value.split(",") if part.strip()]
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Hill orders must be numbers") from exc
+    if not orders or any(order < 0 for order in orders):
+        raise argparse.ArgumentTypeError("Hill orders must be non-negative")
+    return orders
 
 
 def analyze(
@@ -81,6 +98,7 @@ def analyze(
     rarefaction: int = 0,
     traits_path: Path | None = None,
     standardize_trait_values: bool = False,
+    hill_orders: list[float] | None = None,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     traits = read_traits_csv(traits_path) if traits_path else None
@@ -90,6 +108,7 @@ def analyze(
     uncertainty: list[dict[str, object]] = []
     rarefaction_rows: list[dict[str, object]] = []
     functional: list[dict[str, object]] = []
+    hill_profile: list[dict[str, object]] = []
     for site in sorted(communities):
         row: dict[str, object] = {"site": site}
         try:
@@ -118,6 +137,15 @@ def analyze(
         if traits and sum(communities[site].values()) > 0:
             result = calculate_functional_diversity(communities[site], traits)
             functional.extend(result.to_rows(site))
+        if hill_orders and sum(communities[site].values()) > 0:
+            hill_profile.extend(
+                {
+                    "site": site,
+                    "order": order,
+                    "diversity": hill_number(communities[site].values(), order),
+                }
+                for order in hill_orders
+            )
     pairwise: list[dict[str, object]] = []
     for first, second in combinations(sorted(communities), 2):
         try:
@@ -152,6 +180,7 @@ def analyze(
         "bootstrap_replicates": bootstrap,
         "rarefaction_points": rarefaction,
         "traits_standardized": standardize_trait_values,
+        "hill_orders": ",".join(str(order) for order in (hill_orders or [])),
     }
     if traits_path:
         metadata["traits_file"] = traits_path.name
@@ -168,6 +197,7 @@ def analyze(
         "uncertainty": uncertainty,
         "rarefaction": rarefaction_rows,
         "functional": functional,
+        "hill_profile": hill_profile,
     }
 
 
@@ -265,6 +295,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("rarefaction", []))
         + "\n## Functional diversity\n\n"
         + _markdown_table(report.get("functional", []))
+        + "\n## Hill diversity profile\n\n"
+        + _markdown_table(report.get("hill_profile", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -281,6 +313,7 @@ def main(argv: list[str] | None = None) -> int:
                 rarefaction=args.rarefaction,
                 traits_path=args.traits,
                 standardize_trait_values=args.standardize_traits,
+                hill_orders=args.hill_orders,
             ),
             args.format,
             metric=args.metric,

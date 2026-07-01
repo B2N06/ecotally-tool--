@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from ecotally.diversity import calculate_diversity
+from ecotally.diversity import calculate_diversity, hill_number
 
 
 class DiversityTests(unittest.TestCase):
@@ -24,6 +24,20 @@ class DiversityTests(unittest.TestCase):
             with self.subTest(values=values):
                 with self.assertRaises(ValueError):
                     calculate_diversity(values)
+
+    def test_generalized_hill_numbers(self):
+        abundances = [4, 4, 4, 4]
+        for order in (0, 0.5, 1, 2, 3):
+            with self.subTest(order=order):
+                self.assertAlmostEqual(hill_number(abundances, order), 4)
+        self.assertAlmostEqual(
+            hill_number([3, 1], 0.5),
+            ((3 / 4) ** 0.5 + (1 / 4) ** 0.5) ** 2,
+        )
+
+    def test_invalid_hill_order(self):
+        with self.assertRaises(ValueError):
+            hill_number([1, 2], -1)
 
 
 if __name__ == "__main__":

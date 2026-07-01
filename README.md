@@ -86,6 +86,17 @@ source filenames, and SHA-256 hashes of observation and trait files. The hash
 lets collaborators verify that two reports used byte-identical input without
 embedding private field data in the report.
 
+Generate a Hill diversity profile to inspect sensitivity to rare versus
+dominant species:
+
+```shell
+python -m ecotally examples/observations.csv --format markdown \
+  --hill-orders 0,0.5,1,2,3
+```
+
+Order 0 is richness, order 1 is the exponential of Shannon entropy, and order
+2 is inverse Simpson. Higher orders increasingly emphasize dominant species.
+
 ## Development
 
 ```shell

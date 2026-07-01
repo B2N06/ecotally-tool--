@@ -65,3 +65,25 @@ def calculate_diversity(abundances: Iterable[float]) -> DiversityResult:
         hill_q1=exp(shannon),
         hill_q2=inverse_simpson,
     )
+
+
+def hill_number(abundances: Iterable[float], order: float) -> float:
+    """Calculate a Hill number for any non-negative diversity order."""
+
+    values = [float(value) for value in abundances]
+    if order < 0 or order != order or order == float("inf"):
+        raise ValueError("Hill order must be finite and non-negative")
+    if not values or any(value < 0 for value in values):
+        raise ValueError("abundances must be non-empty and non-negative")
+    if any(value != value or value == float("inf") for value in values):
+        raise ValueError("abundances must be finite")
+    positive = [value for value in values if value > 0]
+    total = sum(positive)
+    if total == 0:
+        raise ValueError("total abundance must be greater than zero")
+    if order == 0:
+        return float(len(positive))
+    proportions = [value / total for value in positive]
+    if order == 1:
+        return exp(-sum(p * log(p) for p in proportions))
+    return sum(p**order for p in proportions) ** (1 / (1 - order))

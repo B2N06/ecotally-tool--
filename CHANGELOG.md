@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.0 - 2026-07-01
+
+- Add generalized Hill numbers for any finite non-negative order.
+- Add `--hill-orders` for reproducible diversity profiles.
+- Document how diversity order changes sensitivity to rare and dominant taxa.
+
 ## 0.15.0 - 2026-07-01
 
 - Add reproducibility metadata to JSON and Markdown reports.

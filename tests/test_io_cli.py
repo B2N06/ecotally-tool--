@@ -6,6 +6,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 
+from ecotally import __version__
 from ecotally.cli import main, render_markdown, render_matrix
 from ecotally.io import (
     read_communities_csv,
@@ -101,7 +102,7 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(payload["pairwise"], [])
         self.assertEqual(payload["dataset"][0]["gamma_richness"], 2)
         self.assertEqual(len(payload["species"]), 2)
-        self.assertEqual(payload["metadata"][0]["ecotally_version"], "0.15.0")
+        self.assertEqual(payload["metadata"][0]["ecotally_version"], __version__)
         self.assertEqual(len(payload["metadata"][0]["source_sha256"]), 64)
 
     def test_json_report_contains_pairwise_comparison(self):
@@ -228,6 +229,23 @@ class IoAndCliTests(unittest.TestCase):
         payload = json.loads(output.getvalue())
         self.assertEqual(code, 0)
         self.assertEqual(len(payload["functional"]), 4)
+
+    def test_cli_hill_profile(self):
+        path = self.write_csv(
+            [
+                {"site": "forest", "species": "oak", "abundance": 3},
+                {"site": "forest", "species": "fern", "abundance": 1},
+            ]
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main(
+                [str(path), "--format", "json", "--hill-orders", "0,0.5,1,2"]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(len(payload["hill_profile"]), 4)
+        self.assertEqual(payload["hill_profile"][0]["diversity"], 2)
 
 
 if __name__ == "__main__":
