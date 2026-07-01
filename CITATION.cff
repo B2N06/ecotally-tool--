@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use EcoTally in research, please cite this software."
+title: "EcoTally: transparent community ecology analysis"
+version: 0.6.0
+date-released: 2026-07-01
+license: MIT
+authors:
+  - family-names: "EcoTally contributors"
+repository-code: "https://github.com/B2N06/ecotally"
+keywords:
+  - biodiversity
+  - community ecology
+  - alpha diversity
+  - beta diversity
