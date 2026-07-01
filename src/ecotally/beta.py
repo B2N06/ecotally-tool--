@@ -12,8 +12,11 @@ class PairwiseResult:
     """Dissimilarity between two communities, ranging from zero to one."""
 
     jaccard_dissimilarity: float
+    sorensen_dissimilarity: float
     bray_curtis_dissimilarity: float
     shared_species: int
+    unique_to_first: int
+    unique_to_second: int
 
     def to_dict(self) -> dict[str, float | int]:
         return asdict(self)
@@ -34,7 +37,7 @@ def _validated(community: Mapping[str, float]) -> dict[str, float]:
 def compare_communities(
     first: Mapping[str, float], second: Mapping[str, float]
 ) -> PairwiseResult:
-    """Calculate incidence-based Jaccard and abundance-based Bray-Curtis."""
+    """Calculate incidence- and abundance-based pairwise dissimilarity."""
 
     a, b = _validated(first), _validated(second)
     species = set(a) | set(b)
@@ -46,9 +49,21 @@ def compare_communities(
     union = present_a | present_b
     shared = present_a & present_b
     jaccard = 1.0 - (len(shared) / len(union)) if union else 0.0
+    sorensen = 1.0 - (
+        2 * len(shared) / (len(present_a) + len(present_b))
+        if present_a or present_b
+        else 0.0
+    )
 
     numerator = sum(abs(a.get(name, 0.0) - b.get(name, 0.0)) for name in species)
     denominator = sum(a.get(name, 0.0) + b.get(name, 0.0) for name in species)
     bray_curtis = numerator / denominator
 
-    return PairwiseResult(jaccard, bray_curtis, len(shared))
+    return PairwiseResult(
+        jaccard,
+        sorensen,
+        bray_curtis,
+        len(shared),
+        len(present_a - present_b),
+        len(present_b - present_a),
+    )

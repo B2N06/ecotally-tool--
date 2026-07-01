@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0 - 2026-07-01
+
+- Add Sørensen pairwise dissimilarity.
+- Report species unique to each member of every site pair.
+- Document incidence-based metric interpretation.
+
 ## 0.10.0 - 2026-07-01
 
 - Expose individual-based rarefaction curves through `--rarefaction POINTS`.

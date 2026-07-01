@@ -5,8 +5,9 @@ It turns species-abundance observations into reproducible biodiversity
 summaries without hiding calculations behind a large software stack.
 
 EcoTally provides Shannon diversity, Simpson diversity, inverse Simpson,
-Pielou evenness, Hill numbers (q = 0, 1, 2), Jaccard dissimilarity, and
-Bray-Curtis dissimilarity. Integer count data also receives sample coverage,
+Pielou evenness, Hill numbers (q = 0, 1, 2), Jaccard and Sørensen
+dissimilarity, and Bray-Curtis dissimilarity. Pairwise results also identify
+shared and site-unique species. Integer count data receives sample coverage,
 bias-corrected Chao1 richness, and individual-based rarefaction support.
 Dataset reports partition alpha, beta, and gamma richness and summarize species
 occupancy across sites.
@@ -73,5 +74,6 @@ python -m unittest discover -s tests
 - Zero-abundance records do not contribute to richness or incidence.
 - Shannon uses natural logarithms. Simpson is reported as `1 - sum(p²)`.
 - Jaccard uses presence/absence; Bray-Curtis uses abundance.
+- Sørensen uses presence/absence and gives shared species twice the weight.
 
 EcoTally is released under the MIT License.
