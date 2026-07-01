@@ -21,6 +21,7 @@ from .uncertainty import bootstrap_diversity
 from .functional import calculate_functional_diversity, standardize_traits
 from .svg import render_diversity_svg
 from .contribution import beta_contributions, lcbd_significance
+from .inference import permutation_group_difference
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -95,6 +96,19 @@ def build_parser() -> argparse.ArgumentParser:
         "--group-by",
         help="site metadata field used for group-level community summaries",
     )
+    parser.add_argument(
+        "--group-permutations",
+        type=int,
+        default=0,
+        metavar="N",
+        help="test a two-group mean difference using N label permutations",
+    )
+    parser.add_argument(
+        "--group-metric",
+        choices=("richness", "shannon", "simpson"),
+        default="shannon",
+        help="site metric used by the two-group permutation test",
+    )
     return parser
 
 
@@ -120,6 +134,8 @@ def analyze(
     lcbd_permutations: int = 0,
     site_metadata_path: Path | None = None,
     group_by: str | None = None,
+    group_permutations: int = 0,
+    group_metric: str = "shannon",
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     site_metadata = (
@@ -130,6 +146,8 @@ def analyze(
         traits = standardize_traits(traits)
     if group_by and not site_metadata_path:
         raise ValueError("--group-by requires --site-metadata")
+    if group_permutations and not group_by:
+        raise ValueError("--group-permutations requires --group-by")
     sites: list[dict[str, object]] = []
     uncertainty: list[dict[str, object]] = []
     rarefaction_rows: list[dict[str, object]] = []
@@ -216,6 +234,8 @@ def analyze(
         "hill_orders": ",".join(str(order) for order in (hill_orders or [])),
         "lcbd_permutations": lcbd_permutations,
         "group_by": group_by or "",
+        "group_permutations": group_permutations,
+        "group_metric": group_metric,
     }
     if traits_path:
         metadata["traits_file"] = traits_path.name
@@ -266,6 +286,25 @@ def analyze(
             group_summary.append(
                 {"group_by": group_by, "group": group, **result}
             )
+    group_test: list[dict[str, object]] = []
+    if group_permutations and group_by:
+        values_by_site = {
+            str(row["site"]): float(row[group_metric])
+            for row in sites
+            if group_metric in row
+        }
+        groups_by_site = {
+            site: values.get(group_by, "")
+            for site, values in site_metadata.items()
+        }
+        group_test.append(
+            permutation_group_difference(
+                values_by_site,
+                groups_by_site,
+                metric=group_metric,
+                permutations=group_permutations,
+            )
+        )
     contributions = beta_contributions(communities)
     return {
         "metadata": [metadata],
@@ -288,6 +327,7 @@ def analyze(
         ),
         "metadata_issues": metadata_issues,
         "group_summary": group_summary,
+        "group_test": group_test,
     }
 
 
@@ -436,6 +476,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("metadata_issues", []))
         + "\n## Group summaries\n\n"
         + _markdown_table(report.get("group_summary", []))
+        + "\n## Two-group permutation test\n\n"
+        + _markdown_table(report.get("group_test", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -455,6 +497,8 @@ def main(argv: list[str] | None = None) -> int:
                 lcbd_permutations=args.lcbd_permutations,
                 site_metadata_path=args.site_metadata,
                 group_by=args.group_by,
+                group_permutations=args.group_permutations,
+                group_metric=args.group_metric,
         )
         if args.format == "bundle":
             if not args.output:

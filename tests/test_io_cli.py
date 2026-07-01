@@ -395,6 +395,48 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("requires --site-metadata", errors.getvalue())
 
+    def test_cli_group_permutation_test(self):
+        observations = self.write_csv(
+            [
+                {"site": "c1", "species": "oak", "abundance": 10},
+                {"site": "c2", "species": "oak", "abundance": 10},
+                {"site": "r1", "species": "oak", "abundance": 5},
+                {"site": "r1", "species": "fern", "abundance": 5},
+                {"site": "r2", "species": "oak", "abundance": 5},
+                {"site": "r2", "species": "fern", "abundance": 5},
+            ]
+        )
+        metadata = self.write_csv(
+            [
+                {"site": "c1", "treatment": "control"},
+                {"site": "c2", "treatment": "control"},
+                {"site": "r1", "treatment": "restored"},
+                {"site": "r2", "treatment": "restored"},
+            ],
+            headers=("site", "treatment"),
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main(
+                [
+                    str(observations),
+                    "--format",
+                    "json",
+                    "--site-metadata",
+                    str(metadata),
+                    "--group-by",
+                    "treatment",
+                    "--group-metric",
+                    "richness",
+                    "--group-permutations",
+                    "20",
+                ]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(payload["group_test"][0]["difference_b_minus_a"], 1)
+        self.assertEqual(payload["group_test"][0]["permutations"], 20)
+
 
 if __name__ == "__main__":
     unittest.main()

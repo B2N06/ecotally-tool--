@@ -1,6 +1,6 @@
 """Small, transparent tools for community ecology."""
 
-__version__ = "0.24.0"
+__version__ = "0.25.0"
 
 from .beta import PairwiseResult, compare_communities
 from .diversity import DiversityResult, calculate_diversity, hill_number
@@ -19,6 +19,7 @@ from .functional import (
     standardize_traits,
 )
 from .contribution import beta_contributions, lcbd_significance
+from .inference import permutation_group_difference
 
 __all__ = [
     "DiversityResult",
@@ -41,4 +42,5 @@ __all__ = [
     "standardize_traits",
     "beta_contributions",
     "lcbd_significance",
+    "permutation_group_difference",
 ]

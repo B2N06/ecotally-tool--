@@ -51,6 +51,11 @@ Optional LCBD significance independently permutes every Hellinger-transformed
 species column among sites. Reported p-values use the finite-randomization
 correction `(b+1)/(B+1)` and a fixed default seed.
 
+The two-group test compares arithmetic means of a selected site-level metric.
+Group labels are permuted while group sizes remain fixed. The effect is the
+lexicographically second group mean minus the first; the two-sided p-value
+uses `(b+1)/(B+1)`. Sites missing a group or the metric are excluded.
+
 ## Functional diversity
 
 Community-weighted means use abundance renormalized over species with trait

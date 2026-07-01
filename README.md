@@ -152,6 +152,18 @@ python -m ecotally examples/observations.csv \
 Each group receives site count, gamma richness, mean alpha richness, Whittaker
 beta, and total abundance.
 
+For exactly two groups, test the mean difference in a site-level metric:
+
+```shell
+python -m ecotally examples/observations.csv \
+  --site-metadata examples/site-metadata.csv --group-by habitat \
+  --group-metric shannon --group-permutations 999 --format markdown
+```
+
+The report defines the effect as `mean(group_b) - mean(group_a)`, with group
+names sorted for deterministic direction, and reports a corrected two-sided
+permutation p-value.
+
 ## Development
 
 ```shell

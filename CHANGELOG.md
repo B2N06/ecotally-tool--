@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.25.0 - 2026-07-01
+
+- Add reproducible two-group permutation tests for site metrics.
+- Compare richness, Shannon, or Simpson means with deterministic effect direction.
+- Record metric and permutation settings in report provenance.
+
 ## 0.24.0 - 2026-07-01
 
 - Add metadata-driven group summaries with `--group-by`.

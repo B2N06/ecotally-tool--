@@ -63,6 +63,11 @@ python -m ecotally examples/observations.csv \
 python -m ecotally examples/observations.csv \
   --site-metadata examples/site-metadata.csv --group-by habitat \
   --format markdown
+
+# 对两个组的平均 Shannon 差进行标签置换检验
+python -m ecotally examples/observations.csv \
+  --site-metadata examples/site-metadata.csv --group-by habitat \
+  --group-metric shannon --group-permutations 999 --format markdown
 ```
 
 ## 结果解释
