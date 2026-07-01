@@ -1,7 +1,8 @@
 # EcoTally
 
 [简体中文](README.zh-CN.md) · [Methods and formulas](METHODOLOGY.md) ·
-[Contributing](CONTRIBUTING.md)
+[Contributing](CONTRIBUTING.md) · [Release notes](RELEASE_NOTES.md) ·
+[Roadmap](ROADMAP.md)
 
 EcoTally is a small, auditable open-source toolkit for community ecology.
 It turns species-abundance observations into reproducible biodiversity

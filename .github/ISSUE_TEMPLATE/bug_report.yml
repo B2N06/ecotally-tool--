@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible EcoTally problem
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed and expected behavior.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: EcoTally version
+      placeholder: "0.26.0"
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer
+      description: Include a small anonymized dataset and exact command.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Error output
+      render: shell

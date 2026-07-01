@@ -1,7 +1,8 @@
 # EcoTally
 
 [English](README.md) · [方法与公式](METHODOLOGY.md) ·
-[参与贡献](CONTRIBUTING.md)
+[参与贡献](CONTRIBUTING.md) · [发行说明](RELEASE_NOTES.md) ·
+[路线图](ROADMAP.md)
 
 EcoTally 是一个轻量、透明、可复现的开源群落生态学工具。它读取物种丰度
 数据，生成 α、β、γ 多样性、采样完整度、稀释曲线、功能多样性和数据质量

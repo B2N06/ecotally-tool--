@@ -23,6 +23,11 @@ class ReleaseMetadataTests(unittest.TestCase):
             "CONTRIBUTING.md",
             "LICENSE",
             "SECURITY.md",
+            "RELEASE_NOTES.md",
+            "ROADMAP.md",
+            ".github/ISSUE_TEMPLATE/bug_report.yml",
+            ".github/ISSUE_TEMPLATE/feature_request.yml",
+            ".github/pull_request_template.md",
         ):
             with self.subTest(name=name):
                 self.assertTrue((ROOT / name).is_file())

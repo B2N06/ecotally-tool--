@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose an ecological analysis or workflow improvement
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Ecological use case
+      description: Explain the decision or analysis this feature should support.
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: Method and references
+      description: Define the expected calculation, assumptions, and references.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal input and expected output
+    validations:
+      required: true
