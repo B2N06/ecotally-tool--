@@ -20,7 +20,7 @@ from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
 from .functional import calculate_functional_diversity, standardize_traits
 from .svg import render_diversity_svg
-from .contribution import beta_contributions
+from .contribution import beta_contributions, lcbd_significance
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -79,6 +79,13 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="Q,Q,...",
         help="add a Hill diversity profile for comma-separated orders",
     )
+    parser.add_argument(
+        "--lcbd-permutations",
+        type=int,
+        default=0,
+        metavar="N",
+        help="test LCBD significance using N column permutations",
+    )
     return parser
 
 
@@ -101,6 +108,7 @@ def analyze(
     traits_path: Path | None = None,
     standardize_trait_values: bool = False,
     hill_orders: list[float] | None = None,
+    lcbd_permutations: int = 0,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     traits = read_traits_csv(traits_path) if traits_path else None
@@ -183,6 +191,7 @@ def analyze(
         "rarefaction_points": rarefaction,
         "traits_standardized": standardize_trait_values,
         "hill_orders": ",".join(str(order) for order in (hill_orders or [])),
+        "lcbd_permutations": lcbd_permutations,
     }
     if traits_path:
         metadata["traits_file"] = traits_path.name
@@ -204,6 +213,11 @@ def analyze(
         "hill_profile": hill_profile,
         "lcbd": contributions["lcbd"],
         "scbd": contributions["scbd"],
+        "lcbd_significance": (
+            lcbd_significance(communities, permutations=lcbd_permutations)
+            if lcbd_permutations
+            else []
+        ),
     }
 
 
@@ -346,6 +360,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("lcbd", []))
         + "\n## Species contributions to beta diversity\n\n"
         + _markdown_table(report.get("scbd", []))
+        + "\n## LCBD permutation significance\n\n"
+        + _markdown_table(report.get("lcbd_significance", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -361,7 +377,8 @@ def main(argv: list[str] | None = None) -> int:
             rarefaction=args.rarefaction,
             traits_path=args.traits,
             standardize_trait_values=args.standardize_traits,
-            hill_orders=args.hill_orders,
+                hill_orders=args.hill_orders,
+                lcbd_permutations=args.lcbd_permutations,
         )
         if args.format == "bundle":
             if not args.output:

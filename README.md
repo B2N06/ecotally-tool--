@@ -21,6 +21,16 @@ inspecting dominant and rare species.
 Hellinger-based LCBD and SCBD partitions identify unusually composed sites and
 the species contributing most to overall beta diversity.
 
+Test LCBD against independently permuted species columns:
+
+```shell
+python -m ecotally examples/observations.csv --lcbd-permutations 999 \
+  --format markdown
+```
+
+Permutation tests use a fixed seed by default and report the corrected
+`(exceedances + 1) / (permutations + 1)` p-value.
+
 ```python
 from ecotally import calculate_diversity
 

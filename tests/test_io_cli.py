@@ -274,6 +274,31 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(len(payload["hill_profile"]), 4)
         self.assertEqual(payload["hill_profile"][0]["diversity"], 2)
 
+    def test_cli_lcbd_significance(self):
+        path = self.write_csv(
+            [
+                {"site": "a", "species": "oak", "abundance": 9},
+                {"site": "a", "species": "reed", "abundance": 1},
+                {"site": "b", "species": "oak", "abundance": 1},
+                {"site": "b", "species": "reed", "abundance": 9},
+            ]
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main(
+                [
+                    str(path),
+                    "--format",
+                    "json",
+                    "--lcbd-permutations",
+                    "20",
+                ]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(len(payload["lcbd_significance"]), 2)
+        self.assertEqual(payload["metadata"][0]["lcbd_permutations"], 20)
+
 
 if __name__ == "__main__":
     unittest.main()

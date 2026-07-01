@@ -43,6 +43,9 @@ LCBD and SCBD are calculated by Hellinger-transforming each non-empty site's
 relative abundances (`sqrt(pᵢ)`), centering every species column, and
 partitioning the total squared deviation among site rows (LCBD) and species
 columns (SCBD). Each set sums to one when there is compositional variation.
+Optional LCBD significance independently permutes every Hellinger-transformed
+species column among sites. Reported p-values use the finite-randomization
+correction `(b+1)/(B+1)` and a fixed default seed.
 
 ## Functional diversity
 

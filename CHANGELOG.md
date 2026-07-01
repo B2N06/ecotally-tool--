@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.21.0 - 2026-07-01
+
+- Add reproducible column-permutation significance tests for LCBD.
+- Report finite-randomization corrected p-values and permutation counts.
+- Store LCBD permutation settings in report provenance.
+
 ## 0.20.0 - 2026-07-01
 
 - Add Hellinger-based local contributions to beta diversity (LCBD).

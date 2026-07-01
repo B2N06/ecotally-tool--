@@ -1,6 +1,6 @@
 import unittest
 
-from ecotally.contribution import beta_contributions
+from ecotally.contribution import beta_contributions, lcbd_significance
 
 
 class ContributionTests(unittest.TestCase):
@@ -29,6 +29,32 @@ class ContributionTests(unittest.TestCase):
             {"empty": {"oak": 0}, "forest": {"oak": 2}}
         )
         self.assertEqual(result["lcbd"], [{"site": "forest", "lcbd": 0.0}])
+
+    def test_lcbd_permutation_test_is_reproducible(self):
+        communities = {
+            "forest": {"oak": 9, "reed": 1},
+            "marsh": {"oak": 1, "reed": 9},
+            "edge": {"oak": 5, "reed": 5},
+        }
+        first = lcbd_significance(communities, permutations=50, seed=42)
+        second = lcbd_significance(communities, permutations=50, seed=42)
+        self.assertEqual(first, second)
+        self.assertTrue(all(0 < row["p_value"] <= 1 for row in first))
+        self.assertTrue(all(row["permutations"] == 50 for row in first))
+
+    def test_lcbd_permutation_count_is_validated(self):
+        with self.assertRaises(ValueError):
+            lcbd_significance({"forest": {"oak": 1}}, permutations=9)
+
+    def test_symmetric_two_site_lcbd_is_not_split_by_float_noise(self):
+        result = lcbd_significance(
+            {
+                "a": {"oak": 9, "reed": 1},
+                "b": {"oak": 1, "reed": 9},
+            },
+            permutations=20,
+        )
+        self.assertEqual([row["p_value"] for row in result], [1, 1])
 
 
 if __name__ == "__main__":

@@ -68,6 +68,8 @@ python -m ecotally examples/observations.csv --format bundle -o analysis
 - 报告包含 Berger–Parker 优势度以及可直接绘图的等级–丰度数据。
 - LCBD 与 SCBD 分解会指出组成最独特的样方和推动整体差异的物种。
 
+使用 `--lcbd-permutations 999` 可对 LCBD 运行可复现的物种列置换检验。
+
 完整定义、公式和边界条件见 [METHODOLOGY.md](METHODOLOGY.md)。
 
 ## 可复现性
