@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 - 2026-07-01
+
+- Add structured ecological data-quality audits.
+- Report empty sites without crashing an otherwise usable analysis.
+- Flag all-zero species columns and severe sampling imbalance.
+- Make CSV rendering robust to site rows with different available metrics.
+
 ## 0.7.0 - 2026-07-01
 
 - Add dataset-scale gamma richness, mean alpha richness, and Whittaker beta.

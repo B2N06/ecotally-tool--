@@ -1,11 +1,12 @@
 """Small, transparent tools for community ecology."""
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 from .beta import PairwiseResult, compare_communities
 from .diversity import DiversityResult, calculate_diversity
 from .estimation import RichnessEstimate, estimate_richness, rarefaction_curve
 from .summary import DatasetSummary, summarize_dataset, summarize_species
+from .quality import QualityIssue, audit_communities
 
 __all__ = [
     "DiversityResult",
@@ -18,4 +19,6 @@ __all__ = [
     "DatasetSummary",
     "summarize_dataset",
     "summarize_species",
+    "QualityIssue",
+    "audit_communities",
 ]

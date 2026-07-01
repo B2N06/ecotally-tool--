@@ -118,6 +118,22 @@ class IoAndCliTests(unittest.TestCase):
         self.assertIn("| marsh | 0.1235 |", content)
         self.assertIn("No comparisons available", content)
 
+    def test_empty_site_is_reported_instead_of_crashing(self):
+        path = self.write_csv(
+            [
+                {"site": "empty", "oak": 0},
+                {"site": "forest", "oak": 3},
+            ],
+            headers=("site", "oak"),
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main([str(path), "--format", "json"])
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(payload["sites"][0]["status"], "empty")
+        self.assertEqual(payload["quality"][0]["code"], "empty_site")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -15,6 +15,7 @@ from .diversity import calculate_diversity
 from .io import read_communities_csv
 from .estimation import estimate_richness
 from .summary import summarize_dataset, summarize_species
+from .quality import audit_communities
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -45,26 +46,36 @@ def analyze(
     communities = read_communities_csv(path, layout=layout)
     sites: list[dict[str, object]] = []
     for site in sorted(communities):
-        result = calculate_diversity(communities[site].values())
-        row: dict[str, object] = {"site": site, **result.to_dict()}
+        row: dict[str, object] = {"site": site}
         try:
+            result = calculate_diversity(communities[site].values())
+            row.update(result.to_dict())
             row.update(estimate_richness(communities[site].values()).to_dict())
         except ValueError:
-            # Continuous measures (for example biomass) have valid diversity
-            # metrics but no individual-based richness estimator.
-            pass
+            if sum(communities[site].values()) == 0:
+                row["status"] = "empty"
+            else:
+                # Continuous measures (for example biomass) have valid
+                # diversity metrics but no individual-based estimator.
+                row.update(calculate_diversity(communities[site].values()).to_dict())
         sites.append(row)
     pairwise: list[dict[str, object]] = []
     for first, second in combinations(sorted(communities), 2):
-        result = compare_communities(communities[first], communities[second])
-        pairwise.append(
-            {"site_a": first, "site_b": second, **result.to_dict()}
-        )
+        try:
+            result = compare_communities(communities[first], communities[second])
+            pairwise.append(
+                {"site_a": first, "site_b": second, **result.to_dict()}
+            )
+        except ValueError:
+            pairwise.append(
+                {"site_a": first, "site_b": second, "status": "undefined"}
+            )
     return {
         "dataset": [summarize_dataset(communities).to_dict()],
         "sites": sites,
         "species": summarize_species(communities),
         "pairwise": pairwise,
+        "quality": [issue.to_dict() for issue in audit_communities(communities)],
     }
 
 
@@ -79,7 +90,8 @@ def render(report: dict[str, list[dict[str, object]]], output_format: str) -> st
     from io import StringIO
 
     buffer = StringIO(newline="")
-    writer = csv.DictWriter(buffer, fieldnames=rows[0].keys(), lineterminator="\n")
+    columns = list(dict.fromkeys(key for row in rows for key in row))
+    writer = csv.DictWriter(buffer, fieldnames=columns, lineterminator="\n")
     writer.writeheader()
     writer.writerows(rows)
     return buffer.getvalue()
@@ -118,6 +130,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("species", []))
         + "\n## Pairwise beta diversity\n\n"
         + _markdown_table(report["pairwise"])
+        + "\n## Data quality\n\n"
+        + _markdown_table(report.get("quality", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )

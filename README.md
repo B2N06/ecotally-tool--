@@ -10,6 +10,8 @@ Bray-Curtis dissimilarity. Integer count data also receives sample coverage,
 bias-corrected Chao1 richness, and individual-based rarefaction support.
 Dataset reports partition alpha, beta, and gamma richness and summarize species
 occupancy across sites.
+Built-in quality checks flag empty sites, all-zero species, single-site inputs,
+and severe sampling imbalance before results are interpreted.
 
 ```python
 from ecotally import calculate_diversity
