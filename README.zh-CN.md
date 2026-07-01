@@ -67,6 +67,7 @@ python -m ecotally examples/observations.csv --format bundle -o analysis
 - 报告会标注空样方、全零物种和严重采样不平衡。
 - 报告包含 Berger–Parker 优势度以及可直接绘图的等级–丰度数据。
 - LCBD 与 SCBD 分解会指出组成最独特的样方和推动整体差异的物种。
+- Sørensen 差异会分解为物种替代与丰富度嵌套两部分。
 
 使用 `--lcbd-permutations 999` 可对 LCBD 运行可复现的物种列置换检验。
 

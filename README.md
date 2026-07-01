@@ -20,6 +20,8 @@ Reports also include Berger-Parker dominance and tidy rank-abundance data for
 inspecting dominant and rare species.
 Hellinger-based LCBD and SCBD partitions identify unusually composed sites and
 the species contributing most to overall beta diversity.
+Pairwise Sørensen dissimilarity is partitioned into turnover and nestedness,
+distinguishing species replacement from richness differences.
 
 Test LCBD against independently permuted species columns:
 

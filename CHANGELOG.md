@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.22.0 - 2026-07-01
+
+- Partition Sørensen dissimilarity into turnover and nestedness.
+- Distinguish species replacement from richness-driven subset patterns.
+- Add decomposition identity and pure-nestedness regression tests.
+
 ## 0.21.0 - 2026-07-01
 
 - Add reproducible column-permutation significance tests for LCBD.

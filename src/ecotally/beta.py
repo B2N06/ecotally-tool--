@@ -13,6 +13,8 @@ class PairwiseResult:
 
     jaccard_dissimilarity: float
     sorensen_dissimilarity: float
+    sorensen_turnover: float
+    sorensen_nestedness: float
     bray_curtis_dissimilarity: float
     shared_species: int
     unique_to_first: int
@@ -54,6 +56,17 @@ def compare_communities(
         if present_a or present_b
         else 0.0
     )
+    unique_a = len(present_a - present_b)
+    unique_b = len(present_b - present_a)
+    minimum_unique = min(unique_a, unique_b)
+    turnover = (
+        minimum_unique / (len(shared) + minimum_unique)
+        if len(shared) + minimum_unique > 0
+        else 0.0
+    )
+    nestedness = sorensen - turnover
+    if abs(nestedness) < 1e-12:
+        nestedness = 0.0
 
     numerator = sum(abs(a.get(name, 0.0) - b.get(name, 0.0)) for name in species)
     denominator = sum(a.get(name, 0.0) + b.get(name, 0.0) for name in species)
@@ -62,8 +75,10 @@ def compare_communities(
     return PairwiseResult(
         jaccard,
         sorensen,
+        turnover,
+        nestedness,
         bray_curtis,
         len(shared),
-        len(present_a - present_b),
-        len(present_b - present_a),
+        unique_a,
+        unique_b,
     )

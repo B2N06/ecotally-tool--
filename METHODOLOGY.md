@@ -39,6 +39,10 @@ ecological or sampling uncertainty.
 Here `a` and `b` are site richnesses and `c` is shared richness. Gamma
 richness is the union of observed species across sites.
 
+For Sørensen partitioning, let `b` and `c` instead denote species unique to
+each site and `a` shared species. Simpson turnover is
+`min(b,c)/(a+min(b,c))`; nestedness is Sørensen dissimilarity minus turnover.
+
 LCBD and SCBD are calculated by Hellinger-transforming each non-empty site's
 relative abundances (`sqrt(pᵢ)`), centering every species column, and
 partitioning the total squared deviation among site rows (LCBD) and species
