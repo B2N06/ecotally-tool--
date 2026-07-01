@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.0 - 2026-07-01
+
+- Add reproducibility metadata to JSON and Markdown reports.
+- Record software version, analysis settings, input filenames, and SHA-256.
+- Hash trait files separately when functional analysis is requested.
+
 ## 0.14.0 - 2026-07-01
 
 - Add deterministic z-score standardization for numeric trait tables.

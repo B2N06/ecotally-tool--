@@ -79,6 +79,13 @@ Euclidean; standardize columns first when units or scales differ strongly.
 The `--standardize-traits` option performs a population z-score across species;
 constant traits become zero and therefore do not affect distances.
 
+## Reproducibility
+
+JSON and Markdown reports record the EcoTally version, analysis options,
+source filenames, and SHA-256 hashes of observation and trait files. The hash
+lets collaborators verify that two reports used byte-identical input without
+embedding private field data in the report.
+
 ## Development
 
 ```shell

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import sys
 from itertools import combinations
@@ -143,7 +144,22 @@ def analyze(
             if sum(community.values()) > 0
         ]
         dataset["mean_standardized_richness"] = sum(standardized) / len(standardized)
+    metadata: dict[str, object] = {
+        "ecotally_version": __version__,
+        "source_file": path.name,
+        "source_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "input_layout": layout,
+        "bootstrap_replicates": bootstrap,
+        "rarefaction_points": rarefaction,
+        "traits_standardized": standardize_trait_values,
+    }
+    if traits_path:
+        metadata["traits_file"] = traits_path.name
+        metadata["traits_sha256"] = hashlib.sha256(
+            traits_path.read_bytes()
+        ).hexdigest()
     return {
+        "metadata": [metadata],
         "dataset": [dataset],
         "sites": sites,
         "species": summarize_species(communities),
@@ -229,6 +245,9 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
 
     return (
         "# EcoTally biodiversity report\n\n"
+        "## Reproducibility metadata\n\n"
+        + _markdown_table(report.get("metadata", []))
+        + "\n"
         "## Dataset overview\n\n"
         + _markdown_table(report.get("dataset", []))
         + "\n"
