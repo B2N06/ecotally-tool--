@@ -1,6 +1,6 @@
 import unittest
 
-from ecotally.functional import calculate_functional_diversity
+from ecotally.functional import calculate_functional_diversity, standardize_traits
 
 
 class FunctionalTests(unittest.TestCase):
@@ -34,6 +34,18 @@ class FunctionalTests(unittest.TestCase):
                 {"oak": 1, "fern": 1},
                 {"oak": {"height": 1}, "fern": {"mass": 2}},
             )
+
+    def test_standardization_balances_scales_and_zeroes_constants(self):
+        result = standardize_traits(
+            {
+                "a": {"height": 10, "constant": 3},
+                "b": {"height": 20, "constant": 3},
+            }
+        )
+        self.assertEqual(result["a"]["height"], -1)
+        self.assertEqual(result["b"]["height"], 1)
+        self.assertEqual(result["a"]["constant"], 0)
+        self.assertEqual(result["b"]["constant"], 0)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import dist, isfinite
+from math import dist, isfinite, sqrt
 from typing import Mapping
 
 
@@ -36,6 +36,52 @@ class FunctionalResult:
             for trait, value in self.community_weighted_means.items()
         )
         return rows
+
+
+def standardize_traits(
+    traits: Mapping[str, Mapping[str, float]],
+) -> dict[str, dict[str, float]]:
+    """Z-score numeric traits across species using population variance.
+
+    Constant traits are mapped to zero because they contain no information
+    about functional distance.
+    """
+
+    if not traits:
+        raise ValueError("at least one species with traits is required")
+    trait_names = list(next(iter(traits.values())))
+    if not trait_names:
+        raise ValueError("at least one trait is required")
+    for species, values in traits.items():
+        if set(values) != set(trait_names):
+            raise ValueError(f"inconsistent trait columns for '{species}'")
+        if any(not isfinite(float(value)) for value in values.values()):
+            raise ValueError("trait values must be finite")
+    means = {
+        trait: sum(float(values[trait]) for values in traits.values()) / len(traits)
+        for trait in trait_names
+    }
+    standard_deviations = {
+        trait: sqrt(
+            sum(
+                (float(values[trait]) - means[trait]) ** 2
+                for values in traits.values()
+            )
+            / len(traits)
+        )
+        for trait in trait_names
+    }
+    return {
+        species: {
+            trait: (
+                (float(values[trait]) - means[trait]) / standard_deviations[trait]
+                if standard_deviations[trait] > 0
+                else 0.0
+            )
+            for trait in trait_names
+        }
+        for species, values in traits.items()
+    }
 
 
 def calculate_functional_diversity(

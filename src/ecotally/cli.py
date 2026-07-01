@@ -17,7 +17,7 @@ from .estimation import estimate_richness, expected_richness, rarefaction_curve
 from .summary import summarize_dataset, summarize_species
 from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
-from .functional import calculate_functional_diversity
+from .functional import calculate_functional_diversity, standardize_traits
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -64,6 +64,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="numeric species-trait CSV for functional diversity",
     )
+    parser.add_argument(
+        "--standardize-traits",
+        action="store_true",
+        help="z-score traits before calculating functional distances",
+    )
     return parser
 
 
@@ -74,9 +79,12 @@ def analyze(
     bootstrap: int = 0,
     rarefaction: int = 0,
     traits_path: Path | None = None,
+    standardize_trait_values: bool = False,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     traits = read_traits_csv(traits_path) if traits_path else None
+    if traits and standardize_trait_values:
+        traits = standardize_traits(traits)
     sites: list[dict[str, object]] = []
     uncertainty: list[dict[str, object]] = []
     rarefaction_rows: list[dict[str, object]] = []
@@ -253,6 +261,7 @@ def main(argv: list[str] | None = None) -> int:
                 bootstrap=args.bootstrap,
                 rarefaction=args.rarefaction,
                 traits_path=args.traits,
+                standardize_trait_values=args.standardize_traits,
             ),
             args.format,
             metric=args.metric,

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0 - 2026-07-01
+
+- Add deterministic z-score standardization for numeric trait tables.
+- Map constant traits to zero so they cannot create false distances.
+- Add `--standardize-traits` for safer mixed-unit functional analyses.
+
 ## 0.13.0 - 2026-07-01
 
 - Add numeric species-trait table ingestion.

@@ -214,7 +214,14 @@ class IoAndCliTests(unittest.TestCase):
         output = StringIO()
         with redirect_stdout(output):
             code = main(
-                [str(observations), "--format", "json", "--traits", str(traits)]
+                [
+                    str(observations),
+                    "--format",
+                    "json",
+                    "--traits",
+                    str(traits),
+                    "--standardize-traits",
+                ]
             )
         payload = json.loads(output.getvalue())
         self.assertEqual(code, 0)
