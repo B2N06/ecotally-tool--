@@ -7,7 +7,12 @@ from io import StringIO
 from pathlib import Path
 
 from ecotally.cli import main, render_markdown, render_matrix
-from ecotally.io import read_communities_csv, read_long_csv, read_wide_csv
+from ecotally.io import (
+    read_communities_csv,
+    read_long_csv,
+    read_traits_csv,
+    read_wide_csv,
+)
 
 
 class IoAndCliTests(unittest.TestCase):
@@ -67,6 +72,16 @@ class IoAndCliTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "duplicate site"):
             read_wide_csv(path)
+
+    def test_trait_reader(self):
+        path = self.write_csv(
+            [{"species": "oak", "height": 10, "mass": 4}],
+            headers=("species", "height", "mass"),
+        )
+        self.assertEqual(
+            read_traits_csv(path),
+            {"oak": {"height": 10.0, "mass": 4.0}},
+        )
 
     def test_json_cli_output(self):
         path = self.write_csv(
@@ -181,6 +196,29 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(payload["dataset"][0]["standardized_sample_size"], 4)
         self.assertEqual(len(payload["rarefaction"]), 6)
+
+    def test_cli_functional_diversity(self):
+        observations = self.write_csv(
+            [
+                {"site": "forest", "species": "oak", "abundance": 3},
+                {"site": "forest", "species": "fern", "abundance": 1},
+            ]
+        )
+        traits = self.write_csv(
+            [
+                {"species": "oak", "height": 10},
+                {"species": "fern", "height": 2},
+            ],
+            headers=("species", "height"),
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main(
+                [str(observations), "--format", "json", "--traits", str(traits)]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(len(payload["functional"]), 4)
 
 
 if __name__ == "__main__":

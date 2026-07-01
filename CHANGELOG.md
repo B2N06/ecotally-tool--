@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.0 - 2026-07-01
+
+- Add numeric species-trait table ingestion.
+- Add community-weighted trait means, functional dispersion, and Rao's Q.
+- Report abundance-weighted trait coverage to expose missing trait data.
+
 ## 0.12.0 - 2026-07-01
 
 - Add square symmetric dissimilarity matrix output.

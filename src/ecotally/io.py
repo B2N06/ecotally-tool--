@@ -105,3 +105,36 @@ def read_communities_csv(
         if {"site", "species", "abundance"}.issubset(headers)
         else read_wide_csv(path)
     )
+
+
+def read_traits_csv(
+    path: str | Path, *, species_column: str = "species"
+) -> dict[str, dict[str, float]]:
+    """Read a numeric species-trait table."""
+
+    traits: dict[str, dict[str, float]] = {}
+    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        headers = reader.fieldnames or []
+        if species_column not in headers:
+            raise ValueError(f"missing CSV column: {species_column}")
+        trait_columns = [column for column in headers if column != species_column]
+        if not trait_columns:
+            raise ValueError("trait CSV requires at least one numeric trait")
+        for line_number, row in enumerate(reader, start=2):
+            species = (row[species_column] or "").strip()
+            if not species:
+                raise ValueError(f"line {line_number}: species is required")
+            if species in traits:
+                raise ValueError(f"line {line_number}: duplicate species '{species}'")
+            try:
+                traits[species] = {
+                    trait: float(row[trait]) for trait in trait_columns
+                }
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"line {line_number}: trait values must be numeric"
+                ) from exc
+    if not traits:
+        raise ValueError("trait CSV contains no species")
+    return traits

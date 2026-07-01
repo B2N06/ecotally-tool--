@@ -12,11 +12,12 @@ from pathlib import Path
 from . import __version__
 from .beta import compare_communities
 from .diversity import calculate_diversity
-from .io import read_communities_csv
+from .io import read_communities_csv, read_traits_csv
 from .estimation import estimate_richness, expected_richness, rarefaction_curve
 from .summary import summarize_dataset, summarize_species
 from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
+from .functional import calculate_functional_diversity
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -58,6 +59,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="bray_curtis",
         help="dissimilarity metric for matrix output",
     )
+    parser.add_argument(
+        "--traits",
+        type=Path,
+        help="numeric species-trait CSV for functional diversity",
+    )
     return parser
 
 
@@ -67,11 +73,14 @@ def analyze(
     layout: str = "auto",
     bootstrap: int = 0,
     rarefaction: int = 0,
+    traits_path: Path | None = None,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
+    traits = read_traits_csv(traits_path) if traits_path else None
     sites: list[dict[str, object]] = []
     uncertainty: list[dict[str, object]] = []
     rarefaction_rows: list[dict[str, object]] = []
+    functional: list[dict[str, object]] = []
     for site in sorted(communities):
         row: dict[str, object] = {"site": site}
         try:
@@ -97,6 +106,9 @@ def analyze(
                 communities[site].values(), points=rarefaction
             ):
                 rarefaction_rows.append({"site": site, **point})
+        if traits and sum(communities[site].values()) > 0:
+            result = calculate_functional_diversity(communities[site], traits)
+            functional.extend(result.to_rows(site))
     pairwise: list[dict[str, object]] = []
     for first, second in combinations(sorted(communities), 2):
         try:
@@ -131,6 +143,7 @@ def analyze(
         "quality": [issue.to_dict() for issue in audit_communities(communities)],
         "uncertainty": uncertainty,
         "rarefaction": rarefaction_rows,
+        "functional": functional,
     }
 
 
@@ -223,6 +236,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("uncertainty", []))
         + "\n## Rarefaction curves\n\n"
         + _markdown_table(report.get("rarefaction", []))
+        + "\n## Functional diversity\n\n"
+        + _markdown_table(report.get("functional", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -237,6 +252,7 @@ def main(argv: list[str] | None = None) -> int:
                 layout=args.layout,
                 bootstrap=args.bootstrap,
                 rarefaction=args.rarefaction,
+                traits_path=args.traits,
             ),
             args.format,
             metric=args.metric,

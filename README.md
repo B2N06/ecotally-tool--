@@ -66,6 +66,17 @@ python -m ecotally examples/observations.csv --format matrix
 python -m ecotally examples/observations.csv --format matrix --metric jaccard
 ```
 
+Analyze numeric functional traits:
+
+```shell
+python -m ecotally examples/observations.csv --traits examples/traits.csv \
+  --format markdown -o functional-report.md
+```
+
+Functional reports include trait coverage, abundance-weighted trait means,
+functional dispersion, and Rao's quadratic entropy. Trait distances are
+Euclidean; standardize columns first when units or scales differ strongly.
+
 ## Development
 
 ```shell
