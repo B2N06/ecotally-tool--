@@ -28,7 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-o", "--output", type=Path, help="output file (default: stdout)")
     parser.add_argument(
         "--format",
-        choices=("csv", "json", "markdown"),
+        choices=("csv", "json", "markdown", "matrix"),
         default="csv",
         help="output format",
     )
@@ -51,6 +51,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=0,
         metavar="POINTS",
         help="add individual-based rarefaction curves",
+    )
+    parser.add_argument(
+        "--metric",
+        choices=("jaccard", "sorensen", "bray_curtis"),
+        default="bray_curtis",
+        help="dissimilarity metric for matrix output",
     )
     return parser
 
@@ -128,11 +134,18 @@ def analyze(
     }
 
 
-def render(report: dict[str, list[dict[str, object]]], output_format: str) -> str:
+def render(
+    report: dict[str, list[dict[str, object]]],
+    output_format: str,
+    *,
+    metric: str = "bray_curtis",
+) -> str:
     if output_format == "json":
         return json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if output_format == "markdown":
         return render_markdown(report)
+    if output_format == "matrix":
+        return render_matrix(report, metric)
     rows = report["sites"]
     if not rows:
         return ""
@@ -143,6 +156,31 @@ def render(report: dict[str, list[dict[str, object]]], output_format: str) -> st
     writer = csv.DictWriter(buffer, fieldnames=columns, lineterminator="\n")
     writer.writeheader()
     writer.writerows(rows)
+    return buffer.getvalue()
+
+
+def render_matrix(
+    report: dict[str, list[dict[str, object]]], metric: str
+) -> str:
+    """Render a square, symmetric dissimilarity matrix as CSV."""
+
+    field = f"{metric}_dissimilarity"
+    sites = sorted(str(row["site"]) for row in report["sites"])
+    values = {(site, site): 0.0 for site in sites}
+    for row in report["pairwise"]:
+        if field in row:
+            first, second = str(row["site_a"]), str(row["site_b"])
+            values[(first, second)] = values[(second, first)] = float(row[field])
+
+    from io import StringIO
+
+    buffer = StringIO(newline="")
+    writer = csv.writer(buffer, lineterminator="\n")
+    writer.writerow(["site", *sites])
+    for site in sites:
+        writer.writerow(
+            [site, *(values.get((site, other), "") for other in sites)]
+        )
     return buffer.getvalue()
 
 
@@ -201,6 +239,7 @@ def main(argv: list[str] | None = None) -> int:
                 rarefaction=args.rarefaction,
             ),
             args.format,
+            metric=args.metric,
         )
         if args.output:
             args.output.write_text(content, encoding="utf-8")

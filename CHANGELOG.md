@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.0 - 2026-07-01
+
+- Add square symmetric dissimilarity matrix output.
+- Support Bray-Curtis, Jaccard, and Sørensen matrices.
+- Produce plain CSV matrices for ordination, clustering, R, and GIS workflows.
+
 ## 0.11.0 - 2026-07-01
 
 - Add Sørensen pairwise dissimilarity.

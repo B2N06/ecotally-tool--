@@ -59,6 +59,13 @@ python -m ecotally examples/observations.csv --format json --rarefaction 20
 For integer count datasets, EcoTally also reports mean richness standardized
 to the smallest non-empty site total.
 
+Export a square distance matrix for clustering, ordination, R, or GIS:
+
+```shell
+python -m ecotally examples/observations.csv --format matrix
+python -m ecotally examples/observations.csv --format matrix --metric jaccard
+```
+
 ## Development
 
 ```shell

@@ -6,7 +6,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 
-from ecotally.cli import main, render_markdown
+from ecotally.cli import main, render_markdown, render_matrix
 from ecotally.io import read_communities_csv, read_long_csv, read_wide_csv
 
 
@@ -117,6 +117,23 @@ class IoAndCliTests(unittest.TestCase):
         self.assertIn("# EcoTally biodiversity report", content)
         self.assertIn("| marsh | 0.1235 |", content)
         self.assertIn("No comparisons available", content)
+
+    def test_square_dissimilarity_matrix(self):
+        report = {
+            "sites": [{"site": "b"}, {"site": "a"}],
+            "pairwise": [
+                {
+                    "site_a": "a",
+                    "site_b": "b",
+                    "bray_curtis_dissimilarity": 0.25,
+                }
+            ],
+        }
+        content = render_matrix(report, "bray_curtis")
+        self.assertEqual(
+            content.splitlines(),
+            ["site,a,b", "a,0.0,0.25", "b,0.25,0.0"],
+        )
 
     def test_empty_site_is_reported_instead_of_crashing(self):
         path = self.write_csv(
