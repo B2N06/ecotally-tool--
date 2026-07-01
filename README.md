@@ -40,6 +40,15 @@ diversity and every pairwise site comparison. CSV output contains per-site
 metrics for convenient spreadsheet use.
 Markdown reports are ready to attach to fieldwork notes or repository issues.
 
+Add deterministic percentile bootstrap intervals for integer count data:
+
+```shell
+python -m ecotally examples/observations.csv --format markdown --bootstrap 999
+```
+
+The default random seed is fixed, so identical inputs and settings produce
+identical intervals.
+
 ## Development
 
 ```shell

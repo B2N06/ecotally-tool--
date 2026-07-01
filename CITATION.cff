@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use EcoTally in research, please cite this software."
 title: "EcoTally: transparent community ecology analysis"
-version: 0.8.0
+version: 0.9.0
 date-released: 2026-07-01
 license: MIT
 authors:

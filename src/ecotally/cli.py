@@ -16,6 +16,7 @@ from .io import read_communities_csv
 from .estimation import estimate_richness
 from .summary import summarize_dataset, summarize_species
 from .quality import audit_communities
+from .uncertainty import bootstrap_diversity
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -37,14 +38,22 @@ def build_parser() -> argparse.ArgumentParser:
         default="auto",
         help="input layout (default: detect automatically)",
     )
+    parser.add_argument(
+        "--bootstrap",
+        type=int,
+        default=0,
+        metavar="N",
+        help="add reproducible bootstrap intervals using N replicates",
+    )
     return parser
 
 
 def analyze(
-    path: Path, *, layout: str = "auto"
+    path: Path, *, layout: str = "auto", bootstrap: int = 0
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     sites: list[dict[str, object]] = []
+    uncertainty: list[dict[str, object]] = []
     for site in sorted(communities):
         row: dict[str, object] = {"site": site}
         try:
@@ -59,6 +68,12 @@ def analyze(
                 # diversity metrics but no individual-based estimator.
                 row.update(calculate_diversity(communities[site].values()).to_dict())
         sites.append(row)
+        if bootstrap and sum(communities[site].values()) > 0:
+            intervals = bootstrap_diversity(
+                communities[site].values(), replicates=bootstrap
+            )
+            for metric, values in intervals.items():
+                uncertainty.append({"site": site, "metric": metric, **values})
     pairwise: list[dict[str, object]] = []
     for first, second in combinations(sorted(communities), 2):
         try:
@@ -76,6 +91,7 @@ def analyze(
         "species": summarize_species(communities),
         "pairwise": pairwise,
         "quality": [issue.to_dict() for issue in audit_communities(communities)],
+        "uncertainty": uncertainty,
     }
 
 
@@ -132,6 +148,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report["pairwise"])
         + "\n## Data quality\n\n"
         + _markdown_table(report.get("quality", []))
+        + "\n## Bootstrap uncertainty\n\n"
+        + _markdown_table(report.get("uncertainty", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -140,7 +158,10 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        content = render(analyze(args.input, layout=args.layout), args.format)
+        content = render(
+            analyze(args.input, layout=args.layout, bootstrap=args.bootstrap),
+            args.format,
+        )
         if args.output:
             args.output.write_text(content, encoding="utf-8")
         else:

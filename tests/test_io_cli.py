@@ -134,6 +134,20 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(payload["sites"][0]["status"], "empty")
         self.assertEqual(payload["quality"][0]["code"], "empty_site")
 
+    def test_cli_bootstrap_report(self):
+        path = self.write_csv(
+            [
+                {"site": "forest", "species": "oak", "abundance": 4},
+                {"site": "forest", "species": "fern", "abundance": 2},
+            ]
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main([str(path), "--format", "json", "--bootstrap", "10"])
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(len(payload["uncertainty"]), 4)
+
 
 if __name__ == "__main__":
     unittest.main()

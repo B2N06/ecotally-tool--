@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 - 2026-07-01
+
+- Add reproducible percentile bootstrap intervals for core diversity metrics.
+- Add the `--bootstrap N` CLI option and report uncertainty as tidy rows.
+- Preserve deterministic results with a documented fixed random seed.
+
 ## 0.8.0 - 2026-07-01
 
 - Add structured ecological data-quality audits.
