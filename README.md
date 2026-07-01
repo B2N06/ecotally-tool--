@@ -49,6 +49,15 @@ python -m ecotally examples/observations.csv --format markdown --bootstrap 999
 The default random seed is fixed, so identical inputs and settings produce
 identical intervals.
 
+Generate rarefaction curves with a chosen number of points:
+
+```shell
+python -m ecotally examples/observations.csv --format json --rarefaction 20
+```
+
+For integer count datasets, EcoTally also reports mean richness standardized
+to the smallest non-empty site total.
+
 ## Development
 
 ```shell

@@ -148,6 +148,23 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(len(payload["uncertainty"]), 4)
 
+    def test_cli_rarefaction_and_standardization(self):
+        path = self.write_csv(
+            [
+                {"site": "a", "species": "oak", "abundance": 4},
+                {"site": "a", "species": "fern", "abundance": 2},
+                {"site": "b", "species": "oak", "abundance": 2},
+                {"site": "b", "species": "fern", "abundance": 2},
+            ]
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main([str(path), "--format", "json", "--rarefaction", "3"])
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(payload["dataset"][0]["standardized_sample_size"], 4)
+        self.assertEqual(len(payload["rarefaction"]), 6)
+
 
 if __name__ == "__main__":
     unittest.main()

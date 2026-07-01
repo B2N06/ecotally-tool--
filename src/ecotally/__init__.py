@@ -1,6 +1,6 @@
 """Small, transparent tools for community ecology."""
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 from .beta import PairwiseResult, compare_communities
 from .diversity import DiversityResult, calculate_diversity

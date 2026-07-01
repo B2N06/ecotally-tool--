@@ -13,7 +13,7 @@ from . import __version__
 from .beta import compare_communities
 from .diversity import calculate_diversity
 from .io import read_communities_csv
-from .estimation import estimate_richness
+from .estimation import estimate_richness, expected_richness, rarefaction_curve
 from .summary import summarize_dataset, summarize_species
 from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
@@ -45,15 +45,27 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="N",
         help="add reproducible bootstrap intervals using N replicates",
     )
+    parser.add_argument(
+        "--rarefaction",
+        type=int,
+        default=0,
+        metavar="POINTS",
+        help="add individual-based rarefaction curves",
+    )
     return parser
 
 
 def analyze(
-    path: Path, *, layout: str = "auto", bootstrap: int = 0
+    path: Path,
+    *,
+    layout: str = "auto",
+    bootstrap: int = 0,
+    rarefaction: int = 0,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
     sites: list[dict[str, object]] = []
     uncertainty: list[dict[str, object]] = []
+    rarefaction_rows: list[dict[str, object]] = []
     for site in sorted(communities):
         row: dict[str, object] = {"site": site}
         try:
@@ -74,6 +86,11 @@ def analyze(
             )
             for metric, values in intervals.items():
                 uncertainty.append({"site": site, "metric": metric, **values})
+        if rarefaction and sum(communities[site].values()) > 0:
+            for point in rarefaction_curve(
+                communities[site].values(), points=rarefaction
+            ):
+                rarefaction_rows.append({"site": site, **point})
     pairwise: list[dict[str, object]] = []
     for first, second in combinations(sorted(communities), 2):
         try:
@@ -85,13 +102,29 @@ def analyze(
             pairwise.append(
                 {"site_a": first, "site_b": second, "status": "undefined"}
             )
+    dataset = summarize_dataset(communities).to_dict()
+    positive_totals = [
+        sum(community.values())
+        for community in communities.values()
+        if sum(community.values()) > 0
+    ]
+    if positive_totals and all(total.is_integer() for total in positive_totals):
+        standardized_size = int(min(positive_totals))
+        dataset["standardized_sample_size"] = standardized_size
+        standardized = [
+            expected_richness(community.values(), standardized_size)
+            for community in communities.values()
+            if sum(community.values()) > 0
+        ]
+        dataset["mean_standardized_richness"] = sum(standardized) / len(standardized)
     return {
-        "dataset": [summarize_dataset(communities).to_dict()],
+        "dataset": [dataset],
         "sites": sites,
         "species": summarize_species(communities),
         "pairwise": pairwise,
         "quality": [issue.to_dict() for issue in audit_communities(communities)],
         "uncertainty": uncertainty,
+        "rarefaction": rarefaction_rows,
     }
 
 
@@ -150,6 +183,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("quality", []))
         + "\n## Bootstrap uncertainty\n\n"
         + _markdown_table(report.get("uncertainty", []))
+        + "\n## Rarefaction curves\n\n"
+        + _markdown_table(report.get("rarefaction", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -159,7 +194,12 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         content = render(
-            analyze(args.input, layout=args.layout, bootstrap=args.bootstrap),
+            analyze(
+                args.input,
+                layout=args.layout,
+                bootstrap=args.bootstrap,
+                rarefaction=args.rarefaction,
+            ),
             args.format,
         )
         if args.output:

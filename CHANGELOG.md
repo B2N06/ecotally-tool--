@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.0 - 2026-07-01
+
+- Expose individual-based rarefaction curves through `--rarefaction POINTS`.
+- Add richness standardized to the smallest non-empty site total.
+- Include tidy rarefaction rows in JSON and Markdown reports.
+
 ## 0.9.0 - 2026-07-01
 
 - Add reproducible percentile bootstrap intervals for core diversity metrics.
