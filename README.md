@@ -59,6 +59,8 @@ with or without a BOM are accepted. JSON reports contain both per-site
 diversity and every pairwise site comparison. CSV output contains per-site
 metrics for convenient spreadsheet use.
 Markdown reports are ready to attach to fieldwork notes or repository issues.
+Input delimiters are detected automatically for comma-separated, tab-separated,
+and semicolon-separated community, trait, and site metadata tables.
 
 Add deterministic percentile bootstrap intervals for integer count data:
 

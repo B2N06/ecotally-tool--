@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.26.0 - 2026-07-01
+
+- Detect comma, tab, and semicolon delimiters automatically.
+- Apply delimiter detection consistently to communities, traits, and metadata.
+- Add TSV and semicolon-separated input regression coverage.
+
 ## 0.25.0 - 2026-07-01
 
 - Add reproducible two-group permutation tests for site metrics.

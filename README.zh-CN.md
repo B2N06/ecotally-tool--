@@ -27,6 +27,7 @@ python -m ecotally examples/observations.csv --format markdown -o report.md
 ```
 
 EcoTally 会自动识别长表和“每行一个样方、每列一个物种”的宽表。
+群落、性状和样方元数据均会自动识别逗号、制表符或分号分隔格式。
 
 ## 常用分析
 

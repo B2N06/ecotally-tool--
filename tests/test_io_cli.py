@@ -37,6 +37,24 @@ class IoAndCliTests(unittest.TestCase):
         )
         self.assertEqual(read_long_csv(path), {"wetland": {"reed": 5.0}})
 
+    def test_tab_and_semicolon_delimiters_are_detected(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        tsv = Path(directory.name) / "observations.tsv"
+        tsv.write_text(
+            "site\tspecies\tabundance\nforest\toak\t3\n",
+            encoding="utf-8",
+        )
+        semicolon = Path(directory.name) / "observations.csv"
+        semicolon.write_text(
+            "site;species;abundance\nmarsh;reed;4\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(read_communities_csv(tsv), {"forest": {"oak": 3.0}})
+        self.assertEqual(
+            read_communities_csv(semicolon), {"marsh": {"reed": 4.0}}
+        )
+
     def test_reader_reports_line_number(self):
         path = self.write_csv(
             [{"site": "wetland", "species": "reed", "abundance": "many"}]

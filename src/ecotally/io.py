@@ -7,6 +7,19 @@ from collections import defaultdict
 from pathlib import Path
 
 
+def _detect_delimiter(path: str | Path) -> str:
+    """Detect comma, tab, or semicolon delimiters from a text sample."""
+
+    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
+        sample = handle.read(8192)
+    if not sample:
+        return ","
+    try:
+        return csv.Sniffer().sniff(sample, delimiters=",\t;").delimiter
+    except csv.Error:
+        return ","
+
+
 def read_long_csv(
     path: str | Path,
     *,
@@ -20,7 +33,7 @@ def read_long_csv(
         lambda: defaultdict(float)
     )
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
+        reader = csv.DictReader(handle, delimiter=_detect_delimiter(path))
         required = {site_column, species_column, abundance_column}
         missing = required.difference(reader.fieldnames or [])
         if missing:
@@ -54,7 +67,7 @@ def read_wide_csv(
 
     communities: dict[str, dict[str, float]] = {}
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
+        reader = csv.DictReader(handle, delimiter=_detect_delimiter(path))
         headers = reader.fieldnames or []
         if site_column not in headers:
             raise ValueError(f"missing CSV column: {site_column}")
@@ -99,7 +112,9 @@ def read_communities_csv(
     if layout == "wide":
         return read_wide_csv(path)
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        headers = set(next(csv.reader(handle), []))
+        headers = set(
+            next(csv.reader(handle, delimiter=_detect_delimiter(path)), [])
+        )
     return (
         read_long_csv(path)
         if {"site", "species", "abundance"}.issubset(headers)
@@ -114,7 +129,7 @@ def read_traits_csv(
 
     traits: dict[str, dict[str, float]] = {}
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
+        reader = csv.DictReader(handle, delimiter=_detect_delimiter(path))
         headers = reader.fieldnames or []
         if species_column not in headers:
             raise ValueError(f"missing CSV column: {species_column}")
@@ -147,7 +162,7 @@ def read_site_metadata_csv(
 
     metadata: dict[str, dict[str, str]] = {}
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
+        reader = csv.DictReader(handle, delimiter=_detect_delimiter(path))
         headers = reader.fieldnames or []
         if site_column not in headers:
             raise ValueError(f"missing CSV column: {site_column}")
