@@ -138,3 +138,31 @@ def read_traits_csv(
     if not traits:
         raise ValueError("trait CSV contains no species")
     return traits
+
+
+def read_site_metadata_csv(
+    path: str | Path, *, site_column: str = "site"
+) -> dict[str, dict[str, str]]:
+    """Read site-level metadata while preserving values as text."""
+
+    metadata: dict[str, dict[str, str]] = {}
+    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        headers = reader.fieldnames or []
+        if site_column not in headers:
+            raise ValueError(f"missing CSV column: {site_column}")
+        metadata_columns = [column for column in headers if column != site_column]
+        if not metadata_columns:
+            raise ValueError("site metadata CSV requires at least one data column")
+        for line_number, row in enumerate(reader, start=2):
+            site = (row[site_column] or "").strip()
+            if not site:
+                raise ValueError(f"line {line_number}: site is required")
+            if site in metadata:
+                raise ValueError(f"line {line_number}: duplicate site '{site}'")
+            metadata[site] = {
+                column: (row[column] or "").strip() for column in metadata_columns
+            }
+    if not metadata:
+        raise ValueError("site metadata CSV contains no sites")
+    return metadata

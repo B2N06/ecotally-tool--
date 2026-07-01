@@ -130,6 +130,17 @@ CSV per non-empty report section:
 python -m ecotally examples/observations.csv --format bundle -o analysis
 ```
 
+Join arbitrary site-level fields such as treatment, habitat, year, or
+coordinates:
+
+```shell
+python -m ecotally examples/observations.csv \
+  --site-metadata examples/site-metadata.csv --format json
+```
+
+Joined fields use a `meta_` prefix. Reports flag observation sites without
+metadata and metadata rows without observations.
+
 ## Development
 
 ```shell

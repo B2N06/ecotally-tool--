@@ -11,6 +11,7 @@ from ecotally.cli import main, render_markdown, render_matrix, write_bundle
 from ecotally.io import (
     read_communities_csv,
     read_long_csv,
+    read_site_metadata_csv,
     read_traits_csv,
     read_wide_csv,
 )
@@ -82,6 +83,16 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(
             read_traits_csv(path),
             {"oak": {"height": 10.0, "mass": 4.0}},
+        )
+
+    def test_site_metadata_reader(self):
+        path = self.write_csv(
+            [{"site": "forest", "treatment": "control", "year": 2026}],
+            headers=("site", "treatment", "year"),
+        )
+        self.assertEqual(
+            read_site_metadata_csv(path),
+            {"forest": {"treatment": "control", "year": "2026"}},
         )
 
     def test_json_cli_output(self):
@@ -298,6 +309,43 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(len(payload["lcbd_significance"]), 2)
         self.assertEqual(payload["metadata"][0]["lcbd_permutations"], 20)
+
+    def test_cli_joins_and_audits_site_metadata(self):
+        observations = self.write_csv(
+            [
+                {"site": "forest", "species": "oak", "abundance": 3},
+                {"site": "marsh", "species": "reed", "abundance": 4},
+            ]
+        )
+        metadata = self.write_csv(
+            [
+                {"site": "forest", "habitat": "woodland"},
+                {"site": "unused", "habitat": "grassland"},
+            ],
+            headers=("site", "habitat"),
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            code = main(
+                [
+                    str(observations),
+                    "--format",
+                    "json",
+                    "--site-metadata",
+                    str(metadata),
+                ]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(code, 0)
+        forest = next(row for row in payload["sites"] if row["site"] == "forest")
+        self.assertEqual(forest["meta_habitat"], "woodland")
+        self.assertEqual(
+            {row["code"] for row in payload["metadata_issues"]},
+            {"missing_site_metadata", "unused_site_metadata"},
+        )
+        self.assertEqual(
+            len(payload["metadata"][0]["site_metadata_sha256"]), 64
+        )
 
 
 if __name__ == "__main__":

@@ -54,6 +54,10 @@ python -m ecotally examples/observations.csv --format svg -o diversity.svg
 
 # 导出完整 JSON、清单和各报告分区 CSV
 python -m ecotally examples/observations.csv --format bundle -o analysis
+
+# 联接处理组、年份、栖息地、坐标等样方元数据
+python -m ecotally examples/observations.csv \
+  --site-metadata examples/site-metadata.csv --format json
 ```
 
 ## 结果解释

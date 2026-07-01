@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.23.0 - 2026-07-01
+
+- Add site-level metadata ingestion and safe `meta_` field joins.
+- Hash metadata files in reproducibility provenance.
+- Flag missing observation metadata and unused metadata rows.
+
 ## 0.22.0 - 2026-07-01
 
 - Partition Sørensen dissimilarity into turnover and nestedness.

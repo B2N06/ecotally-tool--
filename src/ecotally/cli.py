@@ -13,7 +13,7 @@ from pathlib import Path
 from . import __version__
 from .beta import compare_communities
 from .diversity import calculate_diversity, hill_number
-from .io import read_communities_csv, read_traits_csv
+from .io import read_communities_csv, read_site_metadata_csv, read_traits_csv
 from .estimation import estimate_richness, expected_richness, rarefaction_curve
 from .summary import rank_abundance, summarize_dataset, summarize_species
 from .quality import audit_communities
@@ -86,6 +86,11 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="N",
         help="test LCBD significance using N column permutations",
     )
+    parser.add_argument(
+        "--site-metadata",
+        type=Path,
+        help="CSV with site-level grouping, location, or time fields",
+    )
     return parser
 
 
@@ -109,8 +114,12 @@ def analyze(
     standardize_trait_values: bool = False,
     hill_orders: list[float] | None = None,
     lcbd_permutations: int = 0,
+    site_metadata_path: Path | None = None,
 ) -> dict[str, list[dict[str, object]]]:
     communities = read_communities_csv(path, layout=layout)
+    site_metadata = (
+        read_site_metadata_csv(site_metadata_path) if site_metadata_path else {}
+    )
     traits = read_traits_csv(traits_path) if traits_path else None
     if traits and standardize_trait_values:
         traits = standardize_traits(traits)
@@ -121,6 +130,13 @@ def analyze(
     hill_profile: list[dict[str, object]] = []
     for site in sorted(communities):
         row: dict[str, object] = {"site": site}
+        if site in site_metadata:
+            row.update(
+                {
+                    f"meta_{key}": value
+                    for key, value in site_metadata[site].items()
+                }
+            )
         try:
             result = calculate_diversity(communities[site].values())
             row.update(result.to_dict())
@@ -198,6 +214,31 @@ def analyze(
         metadata["traits_sha256"] = hashlib.sha256(
             traits_path.read_bytes()
         ).hexdigest()
+    if site_metadata_path:
+        metadata["site_metadata_file"] = site_metadata_path.name
+        metadata["site_metadata_sha256"] = hashlib.sha256(
+            site_metadata_path.read_bytes()
+        ).hexdigest()
+    metadata_issues: list[dict[str, str]] = []
+    for site in sorted(set(communities) - set(site_metadata)):
+        if site_metadata_path:
+            metadata_issues.append(
+                {
+                    "severity": "warning",
+                    "code": "missing_site_metadata",
+                    "site": site,
+                    "message": "Observation site has no matching metadata row.",
+                }
+            )
+    for site in sorted(set(site_metadata) - set(communities)):
+        metadata_issues.append(
+            {
+                "severity": "info",
+                "code": "unused_site_metadata",
+                "site": site,
+                "message": "Metadata site has no observations.",
+            }
+        )
     contributions = beta_contributions(communities)
     return {
         "metadata": [metadata],
@@ -218,6 +259,7 @@ def analyze(
             if lcbd_permutations
             else []
         ),
+        "metadata_issues": metadata_issues,
     }
 
 
@@ -362,6 +404,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report.get("scbd", []))
         + "\n## LCBD permutation significance\n\n"
         + _markdown_table(report.get("lcbd_significance", []))
+        + "\n## Site metadata issues\n\n"
+        + _markdown_table(report.get("metadata_issues", []))
         + "\n_Metrics are calculated by EcoTally. See the project documentation "
         "for formulas and data conventions._\n"
     )
@@ -379,6 +423,7 @@ def main(argv: list[str] | None = None) -> int:
             standardize_trait_values=args.standardize_traits,
                 hill_orders=args.hill_orders,
                 lcbd_permutations=args.lcbd_permutations,
+                site_metadata_path=args.site_metadata,
         )
         if args.format == "bundle":
             if not args.output:

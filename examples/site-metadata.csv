@@ -1,0 +1,3 @@
+site,habitat,treatment,year,latitude,longitude
+forest-edge,edge,control,2026,40.102,116.305
+forest-core,interior,control,2026,40.108,116.299
