@@ -96,3 +96,33 @@ def summarize_species(
             }
         )
     return rows
+
+
+def rank_abundance(
+    communities: Mapping[str, Community],
+) -> list[dict[str, str | float | int]]:
+    """Return ranked relative abundance for every observed site/species pair."""
+
+    data = _validated(communities)
+    rows: list[dict[str, str | float | int]] = []
+    for site, community in sorted(data.items()):
+        positive = [
+            (species, abundance)
+            for species, abundance in community.items()
+            if abundance > 0
+        ]
+        total = sum(abundance for _, abundance in positive)
+        for rank, (species, abundance) in enumerate(
+            sorted(positive, key=lambda item: (-item[1], item[0])),
+            start=1,
+        ):
+            rows.append(
+                {
+                    "site": site,
+                    "rank": rank,
+                    "species": species,
+                    "abundance": abundance,
+                    "relative_abundance": abundance / total,
+                }
+            )
+    return rows

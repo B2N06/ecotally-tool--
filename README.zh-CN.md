@@ -62,6 +62,7 @@ python -m ecotally examples/observations.csv --format svg -o diversity.svg
 - Chao1、稀释和 Bootstrap 要求非负整数个体数。
 - 功能距离使用欧氏距离；性状单位不同时建议启用标准化。
 - 报告会标注空样方、全零物种和严重采样不平衡。
+- 报告包含 Berger–Parker 优势度以及可直接绘图的等级–丰度数据。
 
 完整定义、公式和边界条件见 [METHODOLOGY.md](METHODOLOGY.md)。
 

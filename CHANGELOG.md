@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0 - 2026-07-01
+
+- Add Berger-Parker dominance to every non-empty site summary.
+- Add deterministic rank-abundance rows with species and relative abundance.
+- Expose data needed for dominance inspection and rank-abundance curves.
+
 ## 0.17.0 - 2026-07-01
 
 - Add dependency-free SVG richness and Shannon charts.

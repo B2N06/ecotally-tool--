@@ -11,6 +11,7 @@ excluded from diversity calculations.
 - Simpson diversity: `1 - Σpᵢ²`.
 - Inverse Simpson: `1 / Σpᵢ²`.
 - Pielou evenness: `J′ = H′ / ln(S)`; defined as 1 for one-species samples.
+- Berger-Parker dominance: `max(pᵢ)`.
 - Hill number: `Dq = (Σpᵢ^q)^(1/(1-q))`; its limit at `q=1` is `exp(H′)`.
 
 ## Sampling completeness

@@ -17,6 +17,7 @@ class DiversityResult:
     simpson: float
     inverse_simpson: float
     pielou_evenness: float
+    berger_parker_dominance: float
     hill_q0: float
     hill_q1: float
     hill_q2: float
@@ -61,6 +62,7 @@ def calculate_diversity(abundances: Iterable[float]) -> DiversityResult:
         simpson=simpson,
         inverse_simpson=inverse_simpson,
         pielou_evenness=evenness,
+        berger_parker_dominance=max(proportions),
         hill_q0=float(richness),
         hill_q1=exp(shannon),
         hill_q2=inverse_simpson,

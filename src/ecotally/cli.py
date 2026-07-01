@@ -15,7 +15,7 @@ from .beta import compare_communities
 from .diversity import calculate_diversity, hill_number
 from .io import read_communities_csv, read_traits_csv
 from .estimation import estimate_richness, expected_richness, rarefaction_curve
-from .summary import summarize_dataset, summarize_species
+from .summary import rank_abundance, summarize_dataset, summarize_species
 from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
 from .functional import calculate_functional_diversity, standardize_traits
@@ -193,6 +193,7 @@ def analyze(
         "dataset": [dataset],
         "sites": sites,
         "species": summarize_species(communities),
+        "rank_abundance": rank_abundance(communities),
         "pairwise": pairwise,
         "quality": [issue.to_dict() for issue in audit_communities(communities)],
         "uncertainty": uncertainty,
@@ -288,6 +289,8 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
         + _markdown_table(report["sites"])
         + "\n## Species occupancy\n\n"
         + _markdown_table(report.get("species", []))
+        + "\n## Rank-abundance data\n\n"
+        + _markdown_table(report.get("rank_abundance", []))
         + "\n## Pairwise beta diversity\n\n"
         + _markdown_table(report["pairwise"])
         + "\n## Data quality\n\n"

@@ -12,6 +12,7 @@ class DiversityTests(unittest.TestCase):
         self.assertAlmostEqual(result.shannon, math.log(4))
         self.assertAlmostEqual(result.simpson, 0.75)
         self.assertAlmostEqual(result.pielou_evenness, 1.0)
+        self.assertAlmostEqual(result.berger_parker_dominance, 0.25)
         self.assertAlmostEqual(result.hill_q1, 4.0)
 
     def test_zeros_do_not_count_as_species(self):

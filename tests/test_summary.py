@@ -1,6 +1,6 @@
 import unittest
 
-from ecotally.summary import summarize_dataset, summarize_species
+from ecotally.summary import rank_abundance, summarize_dataset, summarize_species
 
 
 class SummaryTests(unittest.TestCase):
@@ -29,6 +29,14 @@ class SummaryTests(unittest.TestCase):
     def test_empty_dataset_is_rejected(self):
         with self.assertRaises(ValueError):
             summarize_dataset({})
+
+    def test_rank_abundance_is_deterministic(self):
+        rows = rank_abundance(self.communities)
+        forest = [row for row in rows if row["site"] == "forest"]
+        self.assertEqual(forest[0]["species"], "oak")
+        self.assertEqual(forest[0]["rank"], 1)
+        self.assertAlmostEqual(forest[0]["relative_abundance"], 2 / 3)
+        self.assertEqual(forest[1]["species"], "fern")
 
 
 if __name__ == "__main__":

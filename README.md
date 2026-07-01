@@ -16,6 +16,8 @@ Dataset reports partition alpha, beta, and gamma richness and summarize species
 occupancy across sites.
 Built-in quality checks flag empty sites, all-zero species, single-site inputs,
 and severe sampling imbalance before results are interpreted.
+Reports also include Berger-Parker dominance and tidy rank-abundance data for
+inspecting dominant and rare species.
 
 ```python
 from ecotally import calculate_diversity
