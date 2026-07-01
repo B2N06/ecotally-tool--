@@ -84,6 +84,8 @@ class IoAndCliTests(unittest.TestCase):
         self.assertEqual(payload["sites"][0]["richness"], 2)
         self.assertEqual(payload["sites"][0]["sample_coverage"], 1)
         self.assertEqual(payload["pairwise"], [])
+        self.assertEqual(payload["dataset"][0]["gamma_richness"], 2)
+        self.assertEqual(len(payload["species"]), 2)
 
     def test_json_report_contains_pairwise_comparison(self):
         path = self.write_csv(

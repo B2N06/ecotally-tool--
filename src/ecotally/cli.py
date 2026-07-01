@@ -14,6 +14,7 @@ from .beta import compare_communities
 from .diversity import calculate_diversity
 from .io import read_communities_csv
 from .estimation import estimate_richness
+from .summary import summarize_dataset, summarize_species
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -59,7 +60,12 @@ def analyze(
         pairwise.append(
             {"site_a": first, "site_b": second, **result.to_dict()}
         )
-    return {"sites": sites, "pairwise": pairwise}
+    return {
+        "dataset": [summarize_dataset(communities).to_dict()],
+        "sites": sites,
+        "species": summarize_species(communities),
+        "pairwise": pairwise,
+    }
 
 
 def render(report: dict[str, list[dict[str, object]]], output_format: str) -> str:
@@ -103,8 +109,13 @@ def render_markdown(report: dict[str, list[dict[str, object]]]) -> str:
 
     return (
         "# EcoTally biodiversity report\n\n"
+        "## Dataset overview\n\n"
+        + _markdown_table(report.get("dataset", []))
+        + "\n"
         "## Alpha diversity and sampling completeness\n\n"
         + _markdown_table(report["sites"])
+        + "\n## Species occupancy\n\n"
+        + _markdown_table(report.get("species", []))
         + "\n## Pairwise beta diversity\n\n"
         + _markdown_table(report["pairwise"])
         + "\n_Metrics are calculated by EcoTally. See the project documentation "

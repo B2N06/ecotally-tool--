@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0 - 2026-07-01
+
+- Add dataset-scale gamma richness, mean alpha richness, and Whittaker beta.
+- Add species occupancy and total-abundance summaries.
+- Include dataset and species sections in JSON and Markdown reports.
+
 ## 0.6.0 - 2026-07-01
 
 - Add self-contained Markdown biodiversity reports.

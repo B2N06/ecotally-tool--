@@ -8,6 +8,8 @@ EcoTally provides Shannon diversity, Simpson diversity, inverse Simpson,
 Pielou evenness, Hill numbers (q = 0, 1, 2), Jaccard dissimilarity, and
 Bray-Curtis dissimilarity. Integer count data also receives sample coverage,
 bias-corrected Chao1 richness, and individual-based rarefaction support.
+Dataset reports partition alpha, beta, and gamma richness and summarize species
+occupancy across sites.
 
 ```python
 from ecotally import calculate_diversity
