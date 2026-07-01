@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.1 - 2026-07-01
+
+- Add a complete Simplified Chinese guide.
+- Add auditable formulas, assumptions, and interpretation boundaries.
+- Add tests that keep package, citation, and documentation metadata aligned.
+
 ## 0.16.0 - 2026-07-01
 
 - Add generalized Hill numbers for any finite non-negative order.
