@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.0 - 2026-07-01
+
+- Add dependency-free SVG richness and Shannon charts.
+- Include accessible titles, descriptions, site labels, and exact values.
+- Add vector output suitable for documents, repository pages, and presentations.
+
 ## 0.16.1 - 2026-07-01
 
 - Add a complete Simplified Chinese guide.

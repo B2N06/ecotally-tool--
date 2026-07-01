@@ -100,6 +100,13 @@ python -m ecotally examples/observations.csv --format markdown \
 Order 0 is richness, order 1 is the exponential of Shannon entropy, and order
 2 is inverse Simpson. Higher orders increasingly emphasize dominant species.
 
+Create an accessible, publication-friendly vector summary with no plotting
+dependencies:
+
+```shell
+python -m ecotally examples/observations.csv --format svg -o diversity.svg
+```
+
 ## Development
 
 ```shell

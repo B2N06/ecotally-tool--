@@ -19,6 +19,7 @@ from .summary import summarize_dataset, summarize_species
 from .quality import audit_communities
 from .uncertainty import bootstrap_diversity
 from .functional import calculate_functional_diversity, standardize_traits
+from .svg import render_diversity_svg
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -30,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-o", "--output", type=Path, help="output file (default: stdout)")
     parser.add_argument(
         "--format",
-        choices=("csv", "json", "markdown", "matrix"),
+        choices=("csv", "json", "markdown", "matrix", "svg"),
         default="csv",
         help="output format",
     )
@@ -213,6 +214,8 @@ def render(
         return render_markdown(report)
     if output_format == "matrix":
         return render_matrix(report, metric)
+    if output_format == "svg":
+        return render_diversity_svg(report)
     rows = report["sites"]
     if not rows:
         return ""

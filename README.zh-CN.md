@@ -48,6 +48,9 @@ python -m ecotally examples/observations.csv --traits examples/traits.csv \
 # 输出可用于 R、GIS 或聚类的距离矩阵
 python -m ecotally examples/observations.csv --format matrix \
   --metric bray_curtis
+
+# 生成无额外绘图库依赖的矢量图
+python -m ecotally examples/observations.csv --format svg -o diversity.svg
 ```
 
 ## 结果解释
