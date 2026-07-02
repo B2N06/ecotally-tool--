@@ -2,9 +2,9 @@
 
 - Source visual truth path: `design-reference-desktop.png`
 - Implementation screenshot: Computer Use window capture `screenshot-0`
-  (1772 × 1218, EcoTally 0.27.2)
+  (1772 × 1218, EcoTally 0.27.3)
 - Viewport: default 1180 × 780 logical-pixel Windows desktop window
-- State: built-in example data selected, preview populated, primary action visible
+- State: built-in example analyzed, results populated, export actions visible
 - Full-view evidence: the implementation retains the reference hierarchy of
   sidebar, three-step progress, import area, selected-file row, preview table,
   and primary continuation action.
@@ -18,6 +18,8 @@
 - The primary action remains fully visible below the expanding preview at the
   default size; an additional geometry check at the 980 × 680 minimum size
   placed the 45-pixel-high button at y=607 inside the 680-pixel window.
+- The result export action passed the same 980 × 680 geometry check at y=607
+  with a 45-pixel height.
 - Typography: selected filename is now bold dark green and remains readable.
 - Spacing and layout: the selected state keeps the existing vertical rhythm
   without shifting surrounding controls.
@@ -35,6 +37,9 @@
 - Added a preview-table boundary and alternating row backgrounds.
 - Added a regression test ensuring state colors remain distinct.
 - Reserved the bottom import action bar before the preview table expands.
+- Added an analysis-running button state and duplicate-click guard.
+- Reserved the bottom results action bar before the results table expands.
+- Added bordered, alternating rows to the results table.
 
 ## Follow-up polish
 

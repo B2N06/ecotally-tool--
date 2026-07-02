@@ -1,9 +1,9 @@
-# EcoTally 0.27.2
+# EcoTally 0.27.3
 
-EcoTally 0.27.2 keeps the main “check data and continue” action visible at
-smaller window sizes. It includes the contrast improvements from 0.27.1:
-clear selected-file state, separated content surfaces, and easier-to-follow
-preview rows.
+EcoTally 0.27.3 makes longer analyses and result review easier to understand.
+The analysis action now changes to a visible working state and ignores
+duplicate clicks. Result export actions remain visible when tables expand,
+and result rows are easier to scan.
 
 ## Desktop workflow
 

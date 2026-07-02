@@ -124,6 +124,7 @@ class EcoTallyDesktop:
         self.traits_path: Path | None = None
         self.report: dict[str, list[dict[str, object]]] | None = None
         self.step = 1
+        self.analysis_running = False
 
         self.include_sampling = BooleanVar(value=True)
         self.include_uncertainty = BooleanVar(value=False)
@@ -581,9 +582,10 @@ class EcoTallyDesktop:
         footer = Frame(content, bg=COLORS["background"])
         footer.pack(side="bottom", fill=X)
         self._button(footer, "返回", self.show_import, width=10).pack(side=LEFT)
-        self._button(
+        self.start_button = self._button(
             footer, "开始分析", self.start_analysis, primary=True, width=16
-        ).pack(side=RIGHT)
+        )
+        self.start_button.pack(side=RIGHT)
 
     def choose_traits(self) -> None:
         filename = filedialog.askopenfilename(
@@ -596,14 +598,23 @@ class EcoTallyDesktop:
             self.include_functional.set(True)
 
     def start_analysis(self) -> None:
+        if self.analysis_running:
+            return
         if not self.source_path:
             self.show_import()
             return
         if self.include_functional.get() and not self.traits_path:
             messagebox.showinfo("需要性状表", "请先选择物种性状表，或取消性状分析。")
             return
+        self.analysis_running = True
         self.status_text.set("正在分析…")
         self.root.configure(cursor="watch")
+        self.start_button.configure(
+            text="正在分析，请稍候…",
+            bg=COLORS["green_dark"],
+            cursor="watch",
+        )
+        self.root.update_idletasks()
         options = analysis_options(
             sampling=self.include_sampling.get(),
             uncertainty=self.include_uncertainty.get(),
@@ -622,11 +633,19 @@ class EcoTallyDesktop:
         threading.Thread(target=worker, daemon=True).start()
 
     def _analysis_failed(self, message: str) -> None:
+        self.analysis_running = False
         self.root.configure(cursor="")
         self.status_text.set("分析失败")
+        if self.start_button.winfo_exists():
+            self.start_button.configure(
+                text="重新开始分析",
+                bg=COLORS["green"],
+                cursor="hand2",
+            )
         messagebox.showerror("分析未完成", message)
 
     def _analysis_complete(self, report: dict[str, list[dict[str, object]]]) -> None:
+        self.analysis_running = False
         self.root.configure(cursor="")
         self.report = report
         self.status_text.set("分析完成")
@@ -678,30 +697,25 @@ class EcoTallyDesktop:
             "simpson",
             "pielou_evenness",
         )
-        table = ttk.Treeview(content, columns=columns, show="headings", height=8)
-        labels = {
-            "site": "样方",
-            "richness": "丰富度",
-            "shannon": "Shannon",
-            "simpson": "Simpson",
-            "pielou_evenness": "均匀度",
-        }
-        for column in columns:
-            table.heading(column, text=labels[column])
-            table.column(column, anchor="w", width=150)
-        for row in report.get("sites", []):
-            table.insert(
-                "",
-                END,
-                values=[
-                    row.get("site", ""),
-                    row.get("richness", "—"),
-                    self._number(row.get("shannon")),
-                    self._number(row.get("simpson")),
-                    self._number(row.get("pielou_evenness")),
-                ],
-            )
-        table.pack(fill=BOTH, expand=True)
+        self.result_footer = Frame(content, bg=COLORS["background"])
+        self.result_footer.pack(side="bottom", fill=X, pady=(16, 0))
+        self._button(
+            self.result_footer, "返回调整", self.show_analysis, width=11
+        ).pack(side=LEFT)
+        self._button(
+            self.result_footer,
+            "导出 JSON",
+            lambda: self.export_file("json"),
+            width=11,
+        ).pack(side=RIGHT, padx=(8, 0))
+        self.export_bundle_button = self._button(
+            self.result_footer,
+            "导出完整报告",
+            self.export_bundle,
+            primary=True,
+            width=15,
+        )
+        self.export_bundle_button.pack(side=RIGHT)
 
         quality_text = (
             "数据质量检查未发现明显问题。"
@@ -715,17 +729,42 @@ class EcoTallyDesktop:
             fg=COLORS["warning"] if quality else COLORS["muted"],
             font=("Microsoft YaHei UI", 9),
             anchor="w",
-        ).pack(fill=X, pady=(10, 0))
+        ).pack(side="bottom", fill=X, pady=(10, 0))
 
-        footer = Frame(content, bg=COLORS["background"])
-        footer.pack(fill=X, pady=(16, 0))
-        self._button(footer, "返回调整", self.show_analysis, width=11).pack(side=LEFT)
-        self._button(
-            footer, "导出 JSON", lambda: self.export_file("json"), width=11
-        ).pack(side=RIGHT, padx=(8, 0))
-        self._button(
-            footer, "导出完整报告", self.export_bundle, primary=True, width=15
-        ).pack(side=RIGHT)
+        table_frame = Frame(
+            content,
+            bg=COLORS["surface"],
+            highlightbackground=COLORS["line_strong"],
+            highlightthickness=1,
+        )
+        table_frame.pack(fill=BOTH, expand=True)
+        table = ttk.Treeview(table_frame, columns=columns, show="headings", height=8)
+        labels = {
+            "site": "样方",
+            "richness": "丰富度",
+            "shannon": "Shannon",
+            "simpson": "Simpson",
+            "pielou_evenness": "均匀度",
+        }
+        for column in columns:
+            table.heading(column, text=labels[column])
+            table.column(column, anchor="w", width=150)
+        table.tag_configure("even", background=COLORS["surface"])
+        table.tag_configure("odd", background=COLORS["surface_alt"])
+        for index, row in enumerate(report.get("sites", [])):
+            table.insert(
+                "",
+                END,
+                values=[
+                    row.get("site", ""),
+                    row.get("richness", "—"),
+                    self._number(row.get("shannon")),
+                    self._number(row.get("simpson")),
+                    self._number(row.get("pielou_evenness")),
+                ],
+                tags=("even" if index % 2 == 0 else "odd",),
+            )
+        table.pack(fill=BOTH, expand=True)
 
     @staticmethod
     def _number(value: object) -> str:

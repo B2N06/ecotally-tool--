@@ -4,6 +4,7 @@ from pathlib import Path
 
 from ecotally.desktop import (
     COLORS,
+    EcoTallyDesktop,
     analysis_options,
     plain_language_summary,
     preview_tabular_file,
@@ -11,6 +12,11 @@ from ecotally.desktop import (
 
 
 class DesktopLogicTests(unittest.TestCase):
+    def test_analysis_start_ignores_duplicate_click(self):
+        app = EcoTallyDesktop.__new__(EcoTallyDesktop)
+        app.analysis_running = True
+        app.start_analysis()
+
     def test_selected_file_state_is_visually_distinct(self):
         self.assertNotEqual(COLORS["background"], COLORS["surface"])
         self.assertNotEqual(COLORS["background"], COLORS["surface_selected"])

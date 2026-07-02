@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.27.3 - 2026-07-02
+
+- Show a clear in-progress state while an analysis is running.
+- Ignore duplicate clicks on the analysis action.
+- Keep result export actions visible when the results table expands.
+- Add bordered, alternating rows to the site-results table.
+
 ## 0.27.2 - 2026-07-02
 
 - Keep the primary import action visible when the app is resized to its
