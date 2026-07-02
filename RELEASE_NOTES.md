@@ -1,8 +1,16 @@
-# EcoTally 0.26.0
+# EcoTally 0.27.0
 
-EcoTally is a dependency-light community ecology toolkit for reproducible
-species-abundance analysis. This release is the first project-wide preview
-prepared for public distribution.
+EcoTally 0.27.0 adds a no-code Windows desktop app for biology students. The
+single-file `EcoTally.exe` can be downloaded and opened directly, with no
+Python installation required.
+
+## Desktop workflow
+
+- Import CSV or TSV community data and preview it before analysis.
+- Choose ecological questions using plain-language options.
+- Review student-friendly conclusions alongside the underlying metrics.
+- Export JSON reports or complete reproducible analysis bundles.
+- Load a built-in example to learn the workflow safely.
 
 ## Included analyses
 

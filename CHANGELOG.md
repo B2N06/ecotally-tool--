@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.27.0 - 2026-07-02
+
+- Add a native three-step Windows desktop interface for biology students.
+- Add file preview, student-facing analysis choices, result summaries, and exports.
+- Add a reproducible PyInstaller build script for a single-file GUI executable.
+
 ## 0.26.0 - 2026-07-01
 
 - Detect comma, tab, and semicolon delimiters automatically.

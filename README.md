@@ -4,6 +4,21 @@
 [Contributing](CONTRIBUTING.md) · [Release notes](RELEASE_NOTES.md) ·
 [Roadmap](ROADMAP.md)
 
+## For biology students
+
+Have a spreadsheet with sampling sites, species names, and counts? EcoTally
+turns it into an easy-to-read biodiversity report. It helps you see how many
+species were found, whether a community is dominated by a few species, how
+different sites are, and whether sampling may have missed species.
+
+**Windows users can download `EcoTally.exe` and start without installing
+Python or writing code.** Choose a CSV/TSV file, select the questions you want
+to answer, and export the results. The app explains the main findings in plain
+language while keeping the full calculation details for coursework and
+reproducible research.
+
+![EcoTally Windows desktop interface](design-reference-desktop.png)
+
 EcoTally is a small, auditable open-source toolkit for community ecology.
 It turns species-abundance observations into reproducible biodiversity
 summaries without hiding calculations behind a large software stack.
@@ -23,6 +38,14 @@ Hellinger-based LCBD and SCBD partitions identify unusually composed sites and
 the species contributing most to overall beta diversity.
 Pairwise Sørensen dissimilarity is partitioned into turnover and nestedness,
 distinguishing species replacement from richness differences.
+
+## Windows desktop app
+
+Download the newest `EcoTally.exe` from
+[GitHub Releases](https://github.com/B2N06/ecotally-tool--/releases/latest).
+The desktop app follows three steps: import data, choose analyses, and review
+or export results. The command-line and Python interfaces remain available for
+automated or advanced workflows.
 
 Test LCBD against independently permuted species columns:
 

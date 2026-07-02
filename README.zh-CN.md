@@ -4,9 +4,27 @@
 [参与贡献](CONTRIBUTING.md) · [发行说明](RELEASE_NOTES.md) ·
 [路线图](ROADMAP.md)
 
+## 给生物学学生的简单说明
+
+如果你手里有一张记录了“样方、物种、数量”的表格，EcoTally 可以把它变成
+容易阅读的生物多样性报告。它能帮你看出：每个样方有多少种生物、群落是否
+被少数优势种控制、不同样方差别有多大，以及本次采样是否可能漏掉了一些物种。
+
+**Windows 用户直接下载 `EcoTally.exe` 就能使用，不需要安装 Python，也不用
+写代码。** 选择 CSV/TSV 表格、勾选想回答的问题，然后查看或导出结果。软件会
+用简单语言说明主要发现，同时保留课程作业和可复现研究需要的完整计算结果。
+
+![EcoTally Windows 桌面界面](design-reference-desktop.png)
+
 EcoTally 是一个轻量、透明、可复现的开源群落生态学工具。它读取物种丰度
 数据，生成 α、β、γ 多样性、采样完整度、稀释曲线、功能多样性和数据质量
 报告。核心功能只依赖 Python 标准库，便于审计计算过程和长期保存工作流。
+
+## Windows 桌面版
+
+请从 [GitHub Releases](https://github.com/B2N06/ecotally-tool--/releases/latest)
+下载最新版 `EcoTally.exe`。桌面版按“导入数据 → 选择分析 → 查看与导出结果”
+三步操作；需要批量处理或编程调用时，仍可使用命令行和 Python 接口。
 
 ## 快速开始
 
