@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from ecotally.desktop import (
+    COLORS,
     analysis_options,
     plain_language_summary,
     preview_tabular_file,
@@ -10,6 +11,12 @@ from ecotally.desktop import (
 
 
 class DesktopLogicTests(unittest.TestCase):
+    def test_selected_file_state_is_visually_distinct(self):
+        self.assertNotEqual(COLORS["background"], COLORS["surface"])
+        self.assertNotEqual(COLORS["background"], COLORS["surface_selected"])
+        self.assertNotEqual(COLORS["surface"], COLORS["surface_selected"])
+        self.assertNotEqual(COLORS["line"], COLORS["line_strong"])
+
     def test_preview_supports_detected_delimiters(self):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)

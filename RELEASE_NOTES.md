@@ -1,8 +1,9 @@
-# EcoTally 0.27.0
+# EcoTally 0.27.1
 
-EcoTally 0.27.0 adds a no-code Windows desktop app for biology students. The
-single-file `EcoTally.exe` can be downloaded and opened directly, with no
-Python installation required.
+EcoTally 0.27.1 improves the readability of the Windows desktop app. The
+selected data file now uses a clear green state, the page background is
+visibly separated from white content surfaces, and preview rows are easier to
+follow.
 
 ## Desktop workflow
 

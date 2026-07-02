@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.27.1 - 2026-07-02
+
+- Increase contrast between the application background and white content surfaces.
+- Give the selected-data card a green tint, stronger border, and bold filename.
+- Add a visible preview-table boundary and alternating row backgrounds.
+
 ## 0.27.0 - 2026-07-02
 
 - Add a native three-step Windows desktop interface for biology students.

@@ -31,12 +31,14 @@ from .io import _detect_delimiter, read_communities_csv
 
 
 COLORS = {
-    "background": "#FBFCFB",
-    "sidebar": "#F4F7F4",
+    "background": "#EEF3EF",
+    "sidebar": "#E7EEE8",
     "surface": "#FFFFFF",
-    "surface_alt": "#F1F5F1",
-    "line": "#DCE4DC",
-    "muted": "#66736A",
+    "surface_alt": "#F3F7F4",
+    "surface_selected": "#DDF0E2",
+    "line": "#C7D4C9",
+    "line_strong": "#8EAA94",
+    "muted": "#59685E",
     "text": "#1F2923",
     "green": "#137A3D",
     "green_dark": "#0B5D2C",
@@ -144,7 +146,8 @@ class EcoTallyDesktop:
             fieldbackground=COLORS["surface"],
             foreground=COLORS["text"],
             rowheight=28,
-            borderwidth=0,
+            borderwidth=1,
+            relief="solid",
             font=("Microsoft YaHei UI", 10),
         )
         style.configure(
@@ -154,7 +157,11 @@ class EcoTallyDesktop:
             font=("Microsoft YaHei UI", 10, "bold"),
             relief="flat",
         )
-        style.map("Treeview", background=[("selected", COLORS["green_soft"])])
+        style.map(
+            "Treeview",
+            background=[("selected", COLORS["surface_selected"])],
+            foreground=[("selected", COLORS["green_dark"])],
+        )
         style.configure(
             "Student.TCheckbutton",
             background=COLORS["background"],
@@ -354,23 +361,24 @@ class EcoTallyDesktop:
             font=("Microsoft YaHei UI", 9),
         ).pack()
 
-        file_row = Frame(
+        self.file_row = Frame(
             content,
             bg=COLORS["surface_alt"],
-            highlightbackground=COLORS["line"],
+            highlightbackground=COLORS["line_strong"],
             highlightthickness=1,
         )
-        file_row.pack(fill=X, pady=(12, 16))
-        Label(
-            file_row,
+        self.file_row.pack(fill=X, pady=(12, 16))
+        self.file_label = Label(
+            self.file_row,
             textvariable=self.file_text,
             bg=COLORS["surface_alt"],
-            fg=COLORS["text"],
+            fg=COLORS["muted"],
             font=("Microsoft YaHei UI", 10),
             anchor="w",
             padx=16,
             pady=10,
-        ).pack(fill=X)
+        )
+        self.file_label.pack(fill=X)
 
         preview_header = Frame(content, bg=COLORS["background"])
         preview_header.pack(fill=X, pady=(0, 8))
@@ -389,7 +397,12 @@ class EcoTallyDesktop:
             font=("Microsoft YaHei UI", 9),
         ).pack(side=RIGHT)
 
-        table_frame = Frame(content, bg=COLORS["surface"])
+        table_frame = Frame(
+            content,
+            bg=COLORS["surface"],
+            highlightbackground=COLORS["line_strong"],
+            highlightthickness=1,
+        )
         table_frame.pack(fill=BOTH, expand=True)
         self.preview_table = ttk.Treeview(table_frame, show="headings")
         scroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.preview_table.yview)
@@ -426,14 +439,31 @@ class EcoTallyDesktop:
             return
         self.source_path = path
         self.file_text.set(f"{path.name}  ·  {path.stat().st_size / 1024:.1f} KB  ·  已选择")
+        self.file_row.configure(
+            bg=COLORS["surface_selected"],
+            highlightbackground=COLORS["green"],
+            highlightthickness=2,
+        )
+        self.file_label.configure(
+            bg=COLORS["surface_selected"],
+            fg=COLORS["green_dark"],
+            font=("Microsoft YaHei UI", 10, "bold"),
+        )
         self.preview_table.delete(*self.preview_table.get_children())
         self.preview_table["columns"] = headers
         for header in headers:
             self.preview_table.heading(header, text=header)
             self.preview_table.column(header, width=160, minwidth=90, anchor="w")
-        for row in rows:
+        self.preview_table.tag_configure("even", background=COLORS["surface"])
+        self.preview_table.tag_configure("odd", background=COLORS["surface_alt"])
+        for index, row in enumerate(rows):
             padded = row + [""] * (len(headers) - len(row))
-            self.preview_table.insert("", END, values=padded[: len(headers)])
+            self.preview_table.insert(
+                "",
+                END,
+                values=padded[: len(headers)],
+                tags=("even" if index % 2 == 0 else "odd",),
+            )
         self.data_summary_text.set(f"{len(headers)} 列 · 已显示 {len(rows)} 行")
         self.status_text.set("数据文件已载入")
 
