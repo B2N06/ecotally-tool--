@@ -397,6 +397,19 @@ class EcoTallyDesktop:
             font=("Microsoft YaHei UI", 9),
         ).pack(side=RIGHT)
 
+        # Reserve the action bar before the expandable preview so the primary
+        # action remains visible at the minimum supported window height.
+        self.import_footer = Frame(content, bg=COLORS["background"])
+        self.import_footer.pack(side="bottom", fill=X, pady=(16, 0))
+        self.continue_button = self._button(
+            self.import_footer,
+            "检查数据并继续",
+            self.validate_and_continue,
+            primary=True,
+            width=18,
+        )
+        self.continue_button.pack(side=RIGHT)
+
         table_frame = Frame(
             content,
             bg=COLORS["surface"],
@@ -409,16 +422,6 @@ class EcoTallyDesktop:
         self.preview_table.configure(yscrollcommand=scroll.set)
         self.preview_table.pack(side=LEFT, fill=BOTH, expand=True)
         scroll.pack(side=RIGHT, fill=Y)
-
-        footer = Frame(content, bg=COLORS["background"])
-        footer.pack(fill=X, pady=(16, 0))
-        self._button(
-            footer,
-            "检查数据并继续",
-            self.validate_and_continue,
-            primary=True,
-            width=18,
-        ).pack(side=RIGHT)
 
     def choose_file(self) -> None:
         filename = filedialog.askopenfilename(

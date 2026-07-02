@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.27.2 - 2026-07-02
+
+- Keep the primary import action visible when the app is resized to its
+  minimum supported height.
+- Reserve the bottom action bar before allowing the data preview to expand.
+
 ## 0.27.1 - 2026-07-02
 
 - Increase contrast between the application background and white content surfaces.

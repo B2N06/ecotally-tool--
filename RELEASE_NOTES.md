@@ -1,9 +1,9 @@
-# EcoTally 0.27.1
+# EcoTally 0.27.2
 
-EcoTally 0.27.1 improves the readability of the Windows desktop app. The
-selected data file now uses a clear green state, the page background is
-visibly separated from white content surfaces, and preview rows are easier to
-follow.
+EcoTally 0.27.2 keeps the main “check data and continue” action visible at
+smaller window sizes. It includes the contrast improvements from 0.27.1:
+clear selected-file state, separated content surfaces, and easier-to-follow
+preview rows.
 
 ## Desktop workflow
 
