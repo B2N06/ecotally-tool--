@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.27.4 - 2026-07-02
+
+- Report equal richness across all sites instead of selecting an arbitrary
+  “highest” site.
+- Report tied leaders for richness and evenness explicitly.
+- Add regression coverage for equal and tied site summaries.
+
 ## 0.27.3 - 2026-07-02
 
 - Show a clear in-progress state while an analysis is running.

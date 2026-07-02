@@ -2,9 +2,9 @@
 
 - Source visual truth path: `design-reference-desktop.png`
 - Implementation screenshot: Computer Use window capture `screenshot-0`
-  (1772 × 1218, EcoTally 0.27.3)
+  (1772 × 1218, EcoTally 0.27.4)
 - Viewport: default 1180 × 780 logical-pixel Windows desktop window
-- State: built-in example analyzed, results populated, export actions visible
+- State: built-in example analyzed, tied richness conclusion visible
 - Full-view evidence: the implementation retains the reference hierarchy of
   sidebar, three-step progress, import area, selected-file row, preview table,
   and primary continuation action.
@@ -28,6 +28,8 @@
 - Image quality: no raster product imagery is used in this workflow; the
   native controls render sharply at the tested Windows scale.
 - Copy: filename, size, and selected status remain visible in one line.
+- Scientific copy: equal richness is stated as equal across sites instead of
+  assigning an arbitrary single “highest” site.
 
 ## Patches made
 
@@ -40,6 +42,7 @@
 - Added an analysis-running button state and duplicate-click guard.
 - Reserved the bottom results action bar before the results table expands.
 - Added bordered, alternating rows to the results table.
+- Added explicit wording for equal values and tied leaders.
 
 ## Follow-up polish
 

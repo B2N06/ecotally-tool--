@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import tempfile
 import threading
 from pathlib import Path
@@ -101,11 +102,42 @@ def plain_language_summary(report: dict[str, list[dict[str, object]]]) -> str:
             f"{site['site']} 记录到 {site['richness']} 个物种。"
             "只有一个样方，因此暂时不能比较样方之间的差异。"
         )
-    most_even = max(sites, key=lambda row: float(row["pielou_evenness"]))
-    richest = max(sites, key=lambda row: int(row["richness"]))
+    richest_value = max(int(row["richness"]) for row in sites)
+    richest_sites = [
+        str(row["site"]) for row in sites if int(row["richness"]) == richest_value
+    ]
+    if len(richest_sites) == len(sites):
+        richness_text = f"各样方物种丰富度相同（均为 {richest_value} 种）"
+    elif len(richest_sites) > 1:
+        richness_text = (
+            f"{'、'.join(richest_sites)} 的物种丰富度并列最高"
+            f"（{richest_value} 种）"
+        )
+    else:
+        richness_text = (
+            f"{richest_sites[0]} 的物种丰富度最高（{richest_value} 种）"
+        )
+
+    most_even_value = max(float(row["pielou_evenness"]) for row in sites)
+    most_even_sites = [
+        str(row["site"])
+        for row in sites
+        if math.isclose(
+            float(row["pielou_evenness"]),
+            most_even_value,
+            rel_tol=1e-9,
+            abs_tol=1e-12,
+        )
+    ]
+    if len(most_even_sites) == len(sites):
+        evenness_text = "各样方的个体分布均匀度相同"
+    elif len(most_even_sites) > 1:
+        evenness_text = f"{'、'.join(most_even_sites)} 的个体分布并列最均匀"
+    else:
+        evenness_text = f"{most_even_sites[0]} 的个体分布最均匀"
+
     return (
-        f"{richest['site']} 的物种丰富度最高（{richest['richness']} 种）；"
-        f"{most_even['site']} 的个体分布最均匀。"
+        f"{richness_text}；{evenness_text}。"
         "这些结果描述当前样本，不等同于因果结论。"
     )
 

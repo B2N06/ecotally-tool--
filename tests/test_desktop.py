@@ -68,6 +68,54 @@ class DesktopLogicTests(unittest.TestCase):
         self.assertIn("edge 的物种丰富度最高", summary)
         self.assertIn("edge 的个体分布最均匀", summary)
 
+    def test_plain_language_summary_reports_equal_richness(self):
+        report = {
+            "sites": [
+                {
+                    "site": "core",
+                    "richness": 3,
+                    "pielou_evenness": 0.6,
+                    "shannon": 0.8,
+                },
+                {
+                    "site": "edge",
+                    "richness": 3,
+                    "pielou_evenness": 0.9,
+                    "shannon": 1.2,
+                },
+            ]
+        }
+        summary = plain_language_summary(report)
+        self.assertIn("各样方物种丰富度相同（均为 3 种）", summary)
+        self.assertNotIn("core 的物种丰富度最高", summary)
+
+    def test_plain_language_summary_reports_tied_leaders(self):
+        report = {
+            "sites": [
+                {
+                    "site": "north",
+                    "richness": 5,
+                    "pielou_evenness": 0.8,
+                    "shannon": 1.1,
+                },
+                {
+                    "site": "south",
+                    "richness": 5,
+                    "pielou_evenness": 0.8,
+                    "shannon": 1.0,
+                },
+                {
+                    "site": "west",
+                    "richness": 3,
+                    "pielou_evenness": 0.5,
+                    "shannon": 0.7,
+                },
+            ]
+        }
+        summary = plain_language_summary(report)
+        self.assertIn("north、south 的物种丰富度并列最高", summary)
+        self.assertIn("north、south 的个体分布并列最均匀", summary)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,9 +1,8 @@
-# EcoTally 0.27.3
+# EcoTally 0.27.4
 
-EcoTally 0.27.3 makes longer analyses and result review easier to understand.
-The analysis action now changes to a visible working state and ignores
-duplicate clicks. Result export actions remain visible when tables expand,
-and result rows are easier to scan.
+EcoTally 0.27.4 improves the scientific wording of the desktop summary.
+Equal values and tied leaders are now stated explicitly instead of naming an
+arbitrary site as the single highest result.
 
 ## Desktop workflow
 
