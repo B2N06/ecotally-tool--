@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.27.5 - 2026-07-02
+
+- Add a compact student guide for richness, Shannon, Simpson, and evenness.
+- State the Simpson convention used by EcoTally directly on the results page.
+- Reuse the same metric guidance in the built-in help page.
+
 ## 0.27.4 - 2026-07-02
 
 - Report equal richness across all sites instead of selecting an arbitrary

@@ -2,9 +2,9 @@
 
 - Source visual truth path: `design-reference-desktop.png`
 - Implementation screenshot: Computer Use window capture `screenshot-0`
-  (1772 × 1218, EcoTally 0.27.4)
+  (1772 × 1218, EcoTally 0.27.5)
 - Viewport: default 1180 × 780 logical-pixel Windows desktop window
-- State: built-in example analyzed, tied richness conclusion visible
+- State: built-in example analyzed, metric guide and results visible
 - Full-view evidence: the implementation retains the reference hierarchy of
   sidebar, three-step progress, import area, selected-file row, preview table,
   and primary continuation action.
@@ -30,6 +30,8 @@
 - Copy: filename, size, and selected status remain visible in one line.
 - Scientific copy: equal richness is stated as equal across sites instead of
   assigning an arbitrary single “highest” site.
+- Metric copy: the guide matches the implemented Simpson convention and gives
+  students the correct direction for interpreting Simpson and evenness.
 
 ## Patches made
 
@@ -43,6 +45,7 @@
 - Reserved the bottom results action bar before the results table expands.
 - Added bordered, alternating rows to the results table.
 - Added explicit wording for equal values and tied leaders.
+- Added a compact metric guide to the result and help screens.
 
 ## Follow-up polish
 

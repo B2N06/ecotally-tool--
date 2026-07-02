@@ -6,12 +6,19 @@ from ecotally.desktop import (
     COLORS,
     EcoTallyDesktop,
     analysis_options,
+    metric_guide_text,
     plain_language_summary,
     preview_tabular_file,
 )
 
 
 class DesktopLogicTests(unittest.TestCase):
+    def test_metric_guide_explains_direction_and_formula(self):
+        guide = metric_guide_text()
+        self.assertIn("Simpson（1 − Σp²）越高", guide)
+        self.assertIn("均匀度越接近 1", guide)
+        self.assertIn("丰富度是物种数", guide)
+
     def test_analysis_start_ignores_duplicate_click(self):
         app = EcoTallyDesktop.__new__(EcoTallyDesktop)
         app.analysis_running = True

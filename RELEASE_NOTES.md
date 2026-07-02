@@ -1,8 +1,9 @@
-# EcoTally 0.27.4
+# EcoTally 0.27.5
 
-EcoTally 0.27.4 improves the scientific wording of the desktop summary.
-Equal values and tied leaders are now stated explicitly instead of naming an
-arbitrary site as the single highest result.
+EcoTally 0.27.5 adds a compact, student-friendly guide to richness, Shannon,
+Simpson, and Pielou evenness directly on the results screen. It also states
+the Simpson convention used by EcoTally so results are easier to interpret
+correctly.
 
 ## Desktop workflow
 

@@ -142,6 +142,16 @@ def plain_language_summary(report: dict[str, list[dict[str, object]]]) -> str:
     )
 
 
+def metric_guide_text() -> str:
+    """Return a compact, scientifically accurate guide for student readers."""
+
+    return (
+        "怎么读：丰富度是物种数；Shannon 同时考虑物种数和丰度分布；"
+        "Simpson（1 − Σp²）越高表示多样性越高；"
+        "均匀度越接近 1，个体分布越均匀。"
+    )
+
+
 class EcoTallyDesktop:
     """Three-step desktop workflow for students."""
 
@@ -722,6 +732,19 @@ class EcoTallyDesktop:
                 font=("Microsoft YaHei UI", 9),
             ).pack()
 
+        Label(
+            content,
+            text=metric_guide_text(),
+            bg=COLORS["green_soft"],
+            fg=COLORS["green_dark"],
+            font=("Microsoft YaHei UI", 9),
+            justify=LEFT,
+            anchor="w",
+            wraplength=940,
+            padx=14,
+            pady=9,
+        ).pack(fill=X, pady=(0, 12))
+
         columns = (
             "site",
             "richness",
@@ -845,7 +868,9 @@ class EcoTallyDesktop:
             "2. 选择问题\n"
             "默认选项适合课程作业和初步探索。性状分析需要额外的物种性状表。\n\n"
             "3. 阅读结果\n"
-            "先看数据质量，再比较丰富度、Shannon 和均匀度。不要把描述性差异直接当作因果结论。\n\n"
+            "先看数据质量，再比较丰富度、Shannon 和均匀度。\n"
+            f"{metric_guide_text()}\n"
+            "不要把描述性差异直接当作因果结论。\n\n"
             "遇到问题时，可先用左侧“载入示例数据”检查软件是否正常。"
         )
         Label(
