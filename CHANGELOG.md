@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.27.6 - 2026-07-17
+
+- Exclude unused socket, TLS, HTTP, and browser-launch modules from the
+  packaged desktop executable while retaining the standard-library parsing
+  code required by PyInstaller.
+- Add a packaged analysis self-test to catch executable-only startup failures.
+- Add Windows product/version metadata and reproducible SHA-256 sidecars.
+- Add optional Authenticode and Microsoft Artifact Signing release paths.
+- Add GitHub build provenance attestations for Windows artifacts.
+- Document the difference between Firewall and SmartScreen warnings.
+
 ## 0.27.5 - 2026-07-02
 
 - Add a compact student guide for richness, Shannon, Simpson, and evenness.

@@ -1,0 +1,97 @@
+name: Windows build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Test
+        shell: pwsh
+        run: |
+          python -m pip install -e .
+          python -m unittest discover -s tests
+      - name: Build offline executable
+        shell: pwsh
+        run: .\build_windows.ps1 -Python python
+
+      - name: Smoke-test packaged analysis
+        shell: pwsh
+        run: |
+          $process = Start-Process `
+            -FilePath .\dist\EcoTally.exe `
+            -ArgumentList "--self-test" `
+            -PassThru
+          if (-not $process.WaitForExit(15000)) {
+            Stop-Process -Id $process.Id -Force
+            throw "Packaged self-test did not exit within 15 seconds."
+          }
+          if ($process.ExitCode -ne 0) {
+            throw "Packaged self-test failed with exit code $($process.ExitCode)."
+          }
+
+      - name: Sign in to Azure
+        if: ${{ vars.ARTIFACT_SIGNING_ENABLED == 'true' }}
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sign with Microsoft Artifact Signing
+        if: ${{ vars.ARTIFACT_SIGNING_ENABLED == 'true' }}
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ vars.ARTIFACT_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.ARTIFACT_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.ARTIFACT_SIGNING_PROFILE }}
+          files: ${{ github.workspace }}\dist\EcoTally.exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+          description: EcoTally community ecology toolkit
+          description-url: https://github.com/B2N06/ecotally-tool--
+
+      - name: Verify trust metadata and checksum
+        shell: pwsh
+        run: |
+          $signature = Get-AuthenticodeSignature .\dist\EcoTally.exe
+          if ("${{ vars.ARTIFACT_SIGNING_ENABLED }}" -eq "true" -and
+              $signature.Status -ne "Valid") {
+            throw "Expected a valid signature, got $($signature.Status)"
+          }
+          $hash = Get-FileHash .\dist\EcoTally.exe -Algorithm SHA256
+          "$($hash.Hash.ToLowerInvariant())  EcoTally.exe" |
+            Set-Content .\dist\EcoTally.exe.sha256 -Encoding ascii
+          Get-Item .\dist\EcoTally.exe |
+            Select-Object Name, Length,
+              @{Name="Version"; Expression={$_.VersionInfo.FileVersion}},
+              @{Name="Product"; Expression={$_.VersionInfo.ProductName}}
+          $signature | Select-Object Status, StatusMessage
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: dist/EcoTally.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EcoTally-Windows-x64
+          path: |
+            dist/EcoTally.exe
+            dist/EcoTally.exe.sha256
+          if-no-files-found: error

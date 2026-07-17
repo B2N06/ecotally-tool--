@@ -1,9 +1,11 @@
-# EcoTally 0.27.5
+# EcoTally 0.27.6
 
-EcoTally 0.27.5 adds a compact, student-friendly guide to richness, Shannon,
-Simpson, and Pielou evenness directly on the results screen. It also states
-the Simpson convention used by EcoTally so results are easier to interpret
-correctly.
+EcoTally 0.27.6 establishes a safer and more transparent Windows distribution
+baseline. The packaged application excludes unused socket, TLS, HTTP, and
+browser-launch modules, carries Windows product/version metadata, publishes a
+SHA-256 checksum, and has release workflows ready for trusted Authenticode or
+Microsoft Artifact Signing. A packaged analysis self-test now catches
+executable-only startup failures before release.
 
 ## Desktop workflow
 

@@ -47,6 +47,12 @@ The desktop app follows three steps: import data, choose analyses, and review
 or export results. The command-line and Python interfaces remain available for
 automated or advanced workflows.
 
+EcoTally runs fully offline, opens no listening port, and needs no Windows
+Firewall exception. Download `EcoTally.exe.sha256` with the executable and
+verify its hash. An “unknown publisher” prompt is a SmartScreen reputation
+check rather than a network request; see
+[Windows security and trust](WINDOWS_SECURITY.md).
+
 Test LCBD against independently permuted species columns:
 
 ```shell
